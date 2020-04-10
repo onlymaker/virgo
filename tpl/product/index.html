@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>产品</title>
+    <include href="common/header.html"/>
+    <style>
+        .input-group {
+            margin: 1rem auto;
+        }
+        .img-thumbnail {
+            width: 75px;
+        }
+        .justify-content-center {
+            margin-left: 1rem;
+        }
+        .pagination {
+            margin-left: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <include href="product/navbar.html"/>
+    <div class="container-fluid">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">SKU</div>
+            </div>
+            <input type="text" id="sku" class="form-control" value="{{@sku}}"/>
+        </div>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th>SKU</th>
+                <repeat group="{{@fields}}" value="{{@field}}">
+                <check if="{{@field != 'sku'}}">
+                <th>{{@field}}</th>
+                </check>
+                </repeat>
+            </tr>
+            </thead>
+            <repeat group="{{@data}}" value="{{@item}}">
+                <tr>
+                    <td colspan="{{count(@fields)}}">
+                        <img class="img-thumbnail" src="{{@item['image']}}"/>
+                        <span class="justify-content-center">
+                            <div class="btn btn-sm btn-outline-primary btn-download" data-sku="{{@item['sku']}}">下载编辑</div>
+                            <div class="btn btn-sm btn-outline-primary btn-upload">上传更新</div>
+                            <div class="btn btn-sm btn-outline-secondary btn-image" data-sku="{{@item['sku']}}">更新图片</div>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <repeat group="{{@fields}}" key="{{@key}}" value="{{@field}}">
+                    <td>{{@item[@key]}}</td>
+                    </check>
+                    </repeat>
+                </tr>
+            </repeat>
+        </table>
+    </div>
+    <nav>
+        <ul class="pagination justify-content-center"></ul>
+    </nav>
+<script src="{{@BASE}}/js/pagination.js"></script>
+<script>
+    $(function () {
+        let search = buildQuery({
+            sku: "{{@sku}}",
+        });
+        let refresh = function() {
+            let update = buildQuery({
+                sku: $("#sku").val(),
+            });
+            if (search !== update) {
+                location.href = "{{@BASE}}/product/Index?" + update;
+            }
+        };
+        $("#sku").bind("keyup", function (e) {
+            if (e.key === "Enter") {
+                refresh();
+            }
+        });
+        $("ul.pagination").append(pagination("{{@BASE}}/product/Index?" + search + "&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
+        $(".btn-download").on("click", function () {
+            let sku = $(this).data("sku");
+            window.open("{{@BASE}}/product/update/info?sku=" + sku);
+        });
+        $(".btn-upload").on("click", function () {
+            location.href = "{{@BASE}}/product/Upload";
+        });
+        $(".btn-image").on("click", function () {
+            let sku = $(this).data("sku");
+            $.post("{{@BASE}}/product/update/image", {sku: sku})
+                .done(function (data) {
+                    console.log(data);
+                    if (data === "success") {
+                        location.reload();
+                    } else {
+                        alert(data);
+                    }
+                })
+        })
+    })
+</script>
+</body>
+</html>

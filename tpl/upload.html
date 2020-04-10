@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>上传</title>
+    <include href="common/header.html"/>
+    <style>
+        .container {
+            margin: 50px auto;
+        }
+        .form-control {
+            margin: 25px auto;
+        }
+    </style>
+</head>
+<body>
+<include href="common/navbar.html"/>
+<div class="container">
+    <form id="upload-form">
+        <input id="upload-file" class="form-control" type="file" name="upload-test"/>
+        <button class="btn btn-primary put" type="button">PUT</button>
+        <button class="btn btn-primary post" type="button">POST</button>
+    </form>
+    <table class="table"></table>
+</div>
+<script>
+    let putBtn = document.querySelector("button.put");
+    let postBtn = document.querySelector("button.post");
+
+    document.addEventListener("DOMContentLoaded", function () {
+        putBtn.addEventListener("click", put);
+        postBtn.addEventListener("click", post);
+    });
+
+    function put() {
+        let file = getFile(document.getElementById("upload-file"));
+        if (!file) {
+            alert("未选择文件");
+            return;
+        }
+        disableUpload();
+        console.log("PUT ... " + file.name);
+        fetch("{{@base}}/upload/" + file.name, {
+            method: "PUT",
+            body: file,
+        })
+            .then(function (response) {
+                console.log(response);
+                showResult("PUT", file.name);
+            })
+            .catch(generalCallback)
+            .finally(enableUpload);
+    }
+
+    function post() {
+        let file = getFile(document.getElementById("upload-file"));
+        if (!file) {
+            alert("未选择文件");
+            return;
+        }
+        let formData = new FormData();
+        formData.set("enctype", "multipart/form-data");
+        formData.append("name", file.name);
+        formData.append("file", file);
+        disableUpload();
+        console.log("POST ... " + file.name);
+        fetch("{{@base}}/upload/" + file.name, {
+            method: "POST",
+            body: formData,
+        })
+            .then(function (response) {
+                console.log(response);
+                showResult("POST", file.name);
+            })
+            .catch(generalCallback)
+            .finally(enableUpload);
+    }
+
+    function showResult(method, filename) {
+        let html = '<tr><td>' + method + '</td><td><a href="{{@base}}/upload/' + filename + '" target="_blank">' + filename + '</a></td></tr>';
+        document.querySelector("table").insertAdjacentHTML("beforeend", html);
+    }
+
+    function disableUpload() {
+        let html = '<i class="fa fa-spinner fa-pulse animated">';
+        putBtn.setAttribute("disabled", "disabled");
+        putBtn.innerHTML = html;
+        postBtn.setAttribute("disabled", "disabled");
+        postBtn.innerHTML = html;
+    }
+
+    function enableUpload() {
+        putBtn.removeAttribute("disabled");
+        putBtn.innerText = "PUT";
+        postBtn.removeAttribute("disabled");
+        postBtn.innerText = "POST";
+    }
+</script>
+</body>
+</html>

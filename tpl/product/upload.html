@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>上传</title>
+    <include href="common/header.html"/>
+    <style>
+        .container {
+            margin: 50px auto;
+        }
+        .form-control {
+            margin: 25px auto;
+        }
+    </style>
+</head>
+<body>
+<include href="product/navbar.html"/>
+<div class="container">
+    <form id="upload-form">
+        <input id="upload-file" class="form-control" type="file" name="upload"/>
+        <button class="btn btn-primary download" type="button">模板</button>
+        <button class="btn btn-primary post" type="button">上传</button>
+    </form>
+    <table class="table"></table>
+</div>
+<script>
+    let postBtn = document.querySelector("button.post");
+    document.addEventListener("DOMContentLoaded", function () {
+        postBtn.addEventListener("click", post);
+        document.querySelector("button.download").addEventListener("click", function () {
+            window.open("{{@BASE}}/product/Template");
+        })
+    });
+
+    function post() {
+        let file = getFile(document.getElementById("upload-file"));
+        if (!file) {
+            alert("未选择文件");
+            return;
+        }
+        let formData = new FormData();
+        formData.set("enctype", "multipart/form-data");
+        formData.append("upload", file);
+        disableUpload();
+        console.log("POST ... " + file.name);
+        fetch("{{@base}}/product/Upload", {
+            method: "POST",
+            body: formData,
+        })
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (text) {
+                console.log(text);
+                if (text === "success") {
+                    location.href = ("{{@refer}}" || "{{@BASE}}/product/Index");
+                } else {
+                    alert(text);
+                }
+            })
+            .catch(generalCallback)
+            .finally(enableUpload);
+    }
+
+    function disableUpload() {
+        let html = '<i class="fa fa-spinner fa-pulse animated">';
+        postBtn.setAttribute("disabled", "disabled");
+        postBtn.innerHTML = html;
+    }
+
+    function enableUpload() {
+        postBtn.removeAttribute("disabled");
+        postBtn.innerText = "上传";
+    }
+</script>
+</body>
+</html>
