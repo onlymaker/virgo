@@ -9,6 +9,7 @@
         }
         .img-thumbnail {
             width: 75px;
+            cursor: pointer;
         }
         .justify-content-center {
             margin-left: 1rem;
@@ -27,7 +28,7 @@
             </div>
             <input type="text" id="sku" class="form-control" value="{{@sku}}"/>
         </div>
-        <table class="table table-striped">
+        <table class="table table-sm table-borderless">
             <thead class="thead-dark">
             <tr>
                 <th>SKU</th>
@@ -36,24 +37,30 @@
                 <th>{{@field}}</th>
                 </check>
                 </repeat>
+                <th></th>
             </tr>
             </thead>
-            <repeat group="{{@data}}" value="{{@item}}">
+            <repeat group="{{@data}}" key="{{@i}}" value="{{@item}}">
+                <check if="{{!@i || @data[@i-1]['sku']!=@item['sku']}}">
+                <?php @currentSku = @item['sku'] ?>
                 <tr>
-                    <td colspan="{{count(@fields)}}">
-                        <img class="img-thumbnail" src="{{@item['image']}}"/>
+                    <td style="padding-top:1rem;border-top:1px solid #e9ecef"><img class="img-thumbnail" src="{{@item['image']}}"/></td>
+                    <td colspan="{{count(@fields)}}" style="vertical-align:middle;padding-top:1rem;border-top:1px solid #e9ecef">
                         <span class="justify-content-center">
                             <div class="btn btn-sm btn-outline-primary btn-download" data-sku="{{@item['sku']}}">下载编辑</div>
                             <div class="btn btn-sm btn-outline-primary btn-upload">上传更新</div>
                             <div class="btn btn-sm btn-outline-secondary btn-image" data-sku="{{@item['sku']}}">更新图片</div>
+                            <div class="btn btn-sm btn-outline-danger btn-delete" data-sku="{{@item['sku']}}">全部删除</div>
                         </span>
                     </td>
                 </tr>
+                </check>
                 <tr>
                     <repeat group="{{@fields}}" key="{{@key}}" value="{{@field}}">
                     <td>{{@item[@key]}}</td>
                     </check>
                     </repeat>
+                    <td><div class="btn btn-sm btn-outline-danger btn-delete" data-sku="{{@item['sku']}}" data-size="{{@item['size']}}">删除</div></td>
                 </tr>
             </repeat>
         </table>
@@ -81,6 +88,15 @@
             }
         });
         $("ul.pagination").append(pagination("{{@BASE}}/product/Index?" + search + "&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
+        $(".img-thumbnail").on("click", function () {
+            let url = $(this).attr("src");
+            let length = url.lastIndexOf("?");
+            if (length === -1) {
+                window.open(url);
+            } else {
+                window.open(url.substr(0, url.lastIndexOf("?")));
+            }
+        });
         $(".btn-download").on("click", function () {
             let sku = $(this).data("sku");
             window.open("{{@BASE}}/product/update/info?sku=" + sku);
@@ -99,6 +115,26 @@
                         alert(data);
                     }
                 })
+        });
+        $(".btn-delete").on("click", function () {
+            let sku = $(this).data("sku");
+            let size = $(this).data("size") || "";
+            if (confirm("确定要删除" + sku + " " + size + "?")) {
+                let sku = $(this).data("sku");
+                let size = $(this).data("size");
+                $.post("{{@BASE}}/product/delete", {
+                    sku: sku,
+                    size: size,
+                })
+                    .done(function (data) {
+                        console.log(data);
+                        if (data === "success") {
+                            location.reload();
+                        } else {
+                            alert(data);
+                        }
+                    })
+            }
         })
     })
 </script>

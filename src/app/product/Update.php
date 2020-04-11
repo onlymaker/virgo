@@ -43,4 +43,17 @@ class Update extends Index
         }
         echo 'success';
     }
+
+    function delete(\Base $f3)
+    {
+        $sku = $f3->get('POST.sku');
+        $size = $f3->get('POST.size');
+        $product = new SqlMapper('virgo_product');
+        if ($size) {
+            $product->erase(['sku=? and size=?', $sku, $size]);
+        } else {
+            $product->erase(['sku=?', $sku]);
+        }
+        echo 'success';
+    }
 }
