@@ -1,0 +1,7 @@
+/.idea
+/.dockerignore
+/Dockerfile
+/.gitignore
+/.git
+/html/php.ini
+/runtime
