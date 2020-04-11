@@ -7,8 +7,7 @@
     </a>
     <div class="collapse navbar-collapse" id="navbarMenuWrapper">
         <div class="navbar-nav">
-            <a class="nav-item nav-link" href="{{@BASE}}/">首页</a>
-            <a class="nav-item nav-link" href="{{@BASE}}/Upload">上传</a>
+            <a class="nav-item nav-link active" href="{{@BASE}}/">首页</a>
         </div>
     </div>
     <a class="nav-item nav-link" href="javascript:void(0)" id="logout"><i class="fa fa-sign-out">&nbsp;</i>退出</a>
@@ -16,18 +15,6 @@
 <include href="common/modal.html"/>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        [].forEach.call(document.querySelectorAll("nav a"), function(e){
-            let href = e.getAttribute("href");
-            let pageNo = "{{@pageNo}}";
-            if (pageNo) {
-                href = href.substr(0, href.lastIndexOf("/") + 1) + pageNo;
-            }
-            if (href === location.pathname) {
-                e.removeAttribute("href");
-                e.className += " active";
-            }
-        });
-
         document.getElementById("logout").addEventListener("click", function () {
             let logoutModal = document.getElementById("default-modal");
             logoutModal.querySelector(".modal-title").innerText = "提示";
