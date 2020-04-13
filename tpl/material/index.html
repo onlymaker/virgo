@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>产品</title>
+    <include href="common/header.html"/>
+    <style>
+        .input-group {
+            margin: 1rem auto;
+        }
+        .btn, .btn-group {
+            width: 100%;
+        }
+        .btn-group {
+            margin: 2rem auto;
+        }
+        .fa {
+            cursor: pointer;
+        }
+        .justify-content-center {
+            margin-left: 1rem;
+        }
+        .pagination {
+            margin-left: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <include href="material/navbar.html"/>
+    <div class="container-fluid">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">型号</div>
+            </div>
+            <input type="text" id="name" class="form-control" value="{{@name}}"/>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-outline-danger btn-delete">删除</button>
+            <button class="btn btn-outline-primary btn-download">下载编辑</button>
+            <button class="btn btn-outline-primary btn-upload">上传更新</button>
+            <button class="btn btn-outline-primary btn-purchase">采购</button>
+        </div>
+        <table class="table table-sm table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th>&nbsp;<i class="fa fa-mouse-pointer"></i></th>
+                <th>型号</th>
+                <th>类别</th>
+                <th>位置</th>
+                <th>数量</th>
+                <th>单价</th>
+                <th>供应商</th>
+            </tr>
+            </thead>
+            <repeat group="{{@data}}" key="{{@i}}" value="{{@item}}">
+            <tr>
+                <td><input type="checkbox" data-id="{{@item['id']}}"/></td>
+                <td>{{@item["name"]}}</td>
+                <td>{{@item["type"]}}</td>
+                <td>{{@item["location"]}}</td>
+                <td>{{@item["quantity"]}}</td>
+                <td>{{@item["price"]/100}}</td>
+                <td>{{@item["supplier"]}}</td>
+            </tr>
+            </repeat>
+        </table>
+    </div>
+    <nav>
+        <ul class="pagination justify-content-center"></ul>
+    </nav>
+<script src="{{@BASE}}/js/pagination.js"></script>
+<script>
+    $(function () {
+        let selected = false;
+        let search = buildQuery({
+            name: "{{@name}}",
+        });
+        let refresh = function() {
+            let update = buildQuery({
+                name: $("#name").val(),
+            });
+            if (search !== update) {
+                location.href = "{{@BASE}}/material/Index?" + update;
+            }
+        };
+        $("#name").bind("keyup", function (e) {
+            if (e.key === "Enter") {
+                refresh();
+            }
+        });
+        $("ul.pagination").append(pagination("{{@BASE}}/material/Index?" + search + "&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
+        $(".fa-mouse-pointer").on("click", function () {
+            selected = !selected;
+            $("input[type=checkbox]").prop("checked", selected ? "checked" : false);
+        });
+        $("input[type=checkbox]").on("click", function () {
+            if ($(this).prop("checked") || $("input[type=checkbox]:checked").length) {
+                selected = true;
+            } else {
+                selected = false;
+            }
+        });
+        $(".btn-delete").on("click", function () {
+            let id = getSelected();
+            if (id.length) {
+                if (confirm("删除后不能恢复,确定删除?")) {
+                    $.post("{{@BASE}}/material/delete", {
+                        id: id.join(","),
+                    })
+                        .done(function (data) {
+                            console.log(data);
+                            if (data === "success") {
+                                location.reload();
+                            } else {
+                                alert(data);
+                            }
+                        })
+                }
+            } else {
+                alert("Selected none");
+            }
+        });
+        $(".btn-download").on("click", function () {
+            let id = getSelected();
+            if (id.length) {
+                post("{{@BASE}}/material/update/info", {
+                    id: id.join(",")
+                })
+            } else {
+                alert("Selected none");
+            }
+        });
+        $(".btn-upload").on("click", function () {
+            location.href = "{{@BASE}}/material/Upload";
+        });
+        $(".btn-purchase").on("click", function () {
+            let id = getSelected();
+            if (id.length) {
+                location.href = "{{@BASE}}/material/Purchase?id=" + id.join(",")
+            } else {
+                alert("Selected none");
+            }
+        });
+    })
+    function getSelected() {
+        let id = [];
+        $("input[type=checkbox]").each(function () {
+            if ($(this).prop("checked")) {
+                id.push($(this).data("id"));
+            }
+        })
+        return id;
+    }
+</script>
+</body>
+</html>

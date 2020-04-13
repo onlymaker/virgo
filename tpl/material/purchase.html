@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>创建采购单</title>
+    <include href="common/header.html"/>
+    <style>
+        .input-group {
+            margin: 1rem auto;
+        }
+        .btn, .btn-group {
+            width: 100%;
+        }
+        .btn-group {
+            margin: 2rem auto;
+        }
+    </style>
+</head>
+<body>
+    <include href="material/navbar.html"/>
+    <div class="container-fluid">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">采购编号</div>
+            </div>
+            <input type="text" name="serial" class="form-control" value="{{@serial}}"/>
+        </div>
+        <repeat group="{{@data}}" value="{{@item}}">
+        <div class="form-row align-items-center">
+            <div class="col">
+                <label class="form-check-label">型号: {{@item["name"]}}</label>
+            </div>
+            <div class="col">
+                <label class="form-check-label">类别: {{@item["type"]}}</label>
+            </div>
+            <div class="col">
+                <label class="form-check-label">当前数量: {{@item["quantity"]}}</label>
+            </div>
+            <div class="col">
+                <label class="form-check-label">单价: {{@item["price"]/100}}</label>
+            </div>
+            <div class="col">
+                <label class="form-check-label">供应商: {{@item["supplier"]}}</label>
+            </div>
+            <div class="col">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">采购数量</div>
+                    </div>
+                    <input name="quantity" type="text" class="form-control" data-id="{{@item['id']}}"/>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        </repeat>
+        <div class="btn-group">
+            <button class="btn btn-outline-danger btn-cancel" type="button">取消</button>
+            <button class="btn btn-outline-primary btn-submit" type="button">确定</button>
+        </div>
+    </div>
+<script>
+    $(function () {
+        $("button.btn-cancel").on("click", function () {
+            location.href = "{{@BASE}}/material/Index";
+        });
+        $("button.btn-submit").on("click", function () {
+            let serial = $("input[name=serial]").val();
+            if (!serial) {
+                return alert("没有填写采购编号");
+            }
+            let id = [];
+            let quantity = [];
+            $("input[name=quantity]").each(function () {
+                let q = Number($(this).val());
+                if (!q) {
+                    alert("采购数量无效");
+                    return false;
+                }
+                id.push($(this).data("id"));
+                quantity.push(q);
+                console.log(serial, id, quantity);
+                post(location.href, {
+                    serial: serial,
+                    id: id.join(","),
+                    quantity: quantity.join(",")
+                })
+            })
+        })
+    })
+</script>
+</body>
+</html>

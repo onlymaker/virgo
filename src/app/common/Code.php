@@ -24,4 +24,13 @@ class Code
         'process_2' => '底部工艺',
         'third_party' => '外加工',
     ];
+
+    const MATERIAL_SCHEMA = [
+        'name' => '型号',
+        'type' => '类型',
+        'quantity' => '数量',
+        'location' => '位置',
+        'price' => '单价',
+        'supplier' => '供应商',
+    ];
 }

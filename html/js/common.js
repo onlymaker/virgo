@@ -21,6 +21,24 @@ function deleteCookie(name) {
     setCookie(name, null);
 }
 
+function post(url, params, target) {
+    let _form = document.createElement("form");
+    _form.action = url;
+    _form.method = "post";
+    if (target) {
+        _form.target = target;
+    }
+    _form.style.display = "none";
+    for (let x in params) {
+        let param = document.createElement("textarea");
+        param.name = x;
+        param.value = params[x];
+        _form.appendChild(param);
+    }
+    document.body.appendChild(_form);
+    _form.submit();
+}
+
 function buildQuery(data, nullable) {
     return (!!nullable) ?
         Object.keys(data)
