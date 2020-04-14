@@ -5,6 +5,7 @@ namespace app\product;
 use app\common\Code;
 use db\Mysql;
 use db\SqlMapper;
+use onlymaker\ShoeSize;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Upload extends Index
@@ -34,7 +35,12 @@ class Upload extends Index
                     $parse = [];
                     foreach ($name as $k => $v) {
                         if ($v == 'size') {
-                            $parse[$v] = $item[$k];
+                            $euSize = ShoeSize::instance()->convert($item[$k], ShoeSize::EU);
+                            if (in_array($euSize, ShoeSize::instance()->available()['EU'])) {
+                                $parse[$v] = $euSize;
+                            } else {
+                                die('Unknown size: ' . $item[$k]);
+                            }
                         } else {
                             $parse[$v] = $item[$k];
                         }
