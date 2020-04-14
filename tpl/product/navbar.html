@@ -7,14 +7,12 @@
     </a>
     <div class="collapse navbar-collapse" id="navbarMenuWrapper">
         <div class="navbar-nav">
-            <a class="nav-item nav-link" href="{{@BASE}}/">首页</a>
-            <a class="nav-item nav-link" href="{{@BASE}}/product/Index">产品</a>
+            <a class="nav-item nav-link" href="{{@BASE}}/product/Index">首页</a>
             <a class="nav-item nav-link" href="{{@BASE}}/product/Upload">上传</a>
         </div>
     </div>
-    <a class="nav-item nav-link" href="javascript:void(0)" id="logout"><i class="fa fa-sign-out">&nbsp;</i>退出</a>
+    <a class="nav-item nav-link" href="{{@BASE}}/"><i class="fa fa-chevron-left">&nbsp;</i>返回</a>
 </nav>
-<include href="common/modal.html"/>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         [].forEach.call(document.querySelectorAll("nav a"), function(e){
@@ -24,20 +22,5 @@
                 e.className += " active";
             }
         });
-
-        document.getElementById("logout").addEventListener("click", function () {
-            let logoutModal = document.getElementById("default-modal");
-            logoutModal.querySelector(".modal-title").innerText = "提示";
-            logoutModal.querySelector(".modal-body").innerHTML = "<p>是否退出登录?</p>";
-            $("#default-modal").modal("show").on("shown.bs.modal", function () {
-                let logoutConfirm = document.getElementById("default-modal-confirm");
-                logoutConfirm.removeEventListener("click", logout);
-                logoutConfirm.addEventListener("click", logout);
-            });
-        });
     });
-
-    function logout() {
-        location.href = "{{@BASE}}/Logout";
-    }
 </script>
