@@ -12,21 +12,25 @@
     "ext-curl": "*",
     "ext-gmagick": "*",
     "ext-json": "*",
-    "bcosca/fatfree": "dev-3.6.5-syncxplus",
-    "phpoffice/phpspreadsheet": "^1.5",
-    "syncxplus/hub": "0.0.3"
+    "bcosca/fatfree": "dev-3.7.1-syncxplus",
+    "nuovo/spreadsheet-reader": "dev-master",
+    "phpoffice/phpspreadsheet": "^1.5"
   },
   "require-dev": {
     "phpunit/phpunit": "^7.3"
   },
-  "repositories": {
-    "0": {
+  "repositories": [
+    {
       "type": "vcs",
       "url": "https://github.com/syncxplus/fatfree"
     },
-    "packagist": {
+    {
+      "type": "vcs",
+      "url": "git@github.com:syncxplus/spreadsheet-reader.git"
+    },
+    {
       "type": "composer",
       "url": "https://packagist.phpcomposer.com"
     }
-  }
+  ]
 }

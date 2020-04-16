@@ -3,9 +3,9 @@
 namespace app\product;
 
 use app\common\Code;
+use app\common\ShoeSize;
 use db\Mysql;
 use db\SqlMapper;
-use onlymaker\ShoeSize;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Upload extends Index
@@ -26,6 +26,7 @@ class Upload extends Index
         try {
             $sheet = IOFactory::load($_FILES['upload']['tmp_name'])->getSheet(0);
             $data = $sheet->toArray();
+            $shoeSize = new ShoeSize();
             $head = array_shift($data);
             $name = array_keys(Code::PRODUCT_SCHEMA);
             if (count($head) === count($name)) {
@@ -35,8 +36,8 @@ class Upload extends Index
                     $parse = [];
                     foreach ($name as $k => $v) {
                         if ($v == 'size') {
-                            $euSize = ShoeSize::instance()->convert($item[$k], ShoeSize::EU);
-                            if (in_array($euSize, ShoeSize::instance()->available()['EU'])) {
+                            $euSize = $shoeSize->convert($item[$k], ShoeSize::EU);
+                            if (in_array($euSize, $shoeSize->available()['EU'])) {
                                 $parse[$v] = $euSize;
                             } else {
                                 die('Unknown size: ' . $item[$k]);
