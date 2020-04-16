@@ -24,26 +24,28 @@ class Upload extends Index
             die('File is too large');
         }
         try {
-            $sheet = IOFactory::load($_FILES['upload']['tmp_name'])->getSheet(0);
-            $data = $sheet->toArray();
             $shoeSize = new ShoeSize();
-            $head = array_shift($data);
+            $sheet = IOFactory::load($_FILES['upload']['tmp_name'])->getSheet(0);
+            $column = $sheet->getHighestColumn(1);
             $name = array_keys(Code::PRODUCT_SCHEMA);
-            if (count($head) === count($name)) {
+            if ((ord($column) - ord('A') + 1) === count($name)) {
                 $sku = [];
                 $product = new SqlMapper('virgo_product');
-                foreach ($data as $item) {
+                $i = $sheet->getRowIterator(2);
+                while ($i->valid() && $sheet->getCell('A' . $i->key())) {
                     $parse = [];
                     foreach ($name as $k => $v) {
+                        $cell = chr(ord('A') + $k) . $i->key();
+                        $value = $sheet->getCell($cell)->getFormattedValue();
                         if ($v == 'size') {
-                            $euSize = $shoeSize->convert($item[$k], ShoeSize::EU);
+                            $euSize = $shoeSize->convert($value, ShoeSize::EU);
                             if (in_array($euSize, $shoeSize->available()['EU'])) {
                                 $parse[$v] = $euSize;
                             } else {
-                                die('Unknown size: ' . $item[$k]);
+                                die($cell . ' Unknown size: ' . $value);
                             }
                         } else {
-                            $parse[$v] = $item[$k];
+                            $parse[$v] = $value;
                         }
                     }
                     $product->load(['sku=? and size=?', $parse['sku'], $parse['size']]);
@@ -52,6 +54,7 @@ class Upload extends Index
                     if (!$product['image']) {
                         $sku[] = $parse['sku'];
                     }
+                    $i->next();
                 }
                 $sku = array_unique($sku);
                 if ($sku) {
