@@ -32,7 +32,7 @@ class Upload extends Index
                 while ($i->valid() && $sheet->getCell('A' . $i->key())) {
                     $parse = [];
                     foreach ($name as $k => $v) {
-                        $parse[$v] = $sheet->getCell(chr(ord('A') + $k) . $i->key())->getFormattedValue();
+                        $parse[$v] = trim($sheet->getCell(chr(ord('A') + $k) . $i->key())->getFormattedValue());
                     }
                     $parse['price'] = intval(floatval($parse['price']) * 100);
                     $material->load(['name=? and type=?', $parse['name'], $parse['type']]);

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>已取消订单</title>
+    <include href="common/header.html"/>
+    <style>
+        .img-thumbnail {
+            width: 75px;
+            cursor: pointer;
+            border: none;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .justify-content-center {
+            margin-left: 1rem;
+        }
+        .pagination {
+            margin-left: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <include href="order/navbar.html"/>
+    <div class="container-fluid">
+        <table class="table table-sm">
+            <thead class="thead-dark">
+            <tr>
+                <th>缩略图</th>
+                <th>订单</th>
+                <th>状态</th>
+                <th>SKU</th>
+                <th>总数</th>
+                <th>创建日期</th>
+                <th>取消日期</th>
+            </tr>
+            </thead>
+            <repeat group="{{@data}}" value="{{@item}}">
+                <tr>
+                    <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
+                    <td>{{@item['order_number']}}</td>
+                    <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
+                    <td>{{@item['sku']}}</td>
+                    <td>{{@item['quantity']}}</td>
+                    <td>{{@item['create_time']}}</td>
+                    <td>{{@item['update_time']}}</td>
+                </tr>
+            </repeat>
+        </table>
+    </div>
+    <nav>
+        <ul class="pagination justify-content-center"></ul>
+    </nav>
+<script src="{{@BASE}}/js/pagination.js"></script>
+<script>
+    $(function () {
+        $("ul.pagination").append(pagination("{{@BASE}}/order/Cancel?pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
+    })
+</script>
+</body>
+</html>

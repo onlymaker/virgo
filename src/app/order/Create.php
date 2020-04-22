@@ -3,6 +3,7 @@
 namespace app\order;
 
 use app\common\OrderStatus;
+use app\common\ShoeSize;
 use db\Mysql;
 use db\SqlMapper;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -18,9 +19,8 @@ class Create extends Index
     {
         $failure = [];
         $success = [];
-        $orders = $f3->get('POST.order_number');
-        if ($orders) {
-            $orders = [$orders];
+        if ($f3->get('POST.order_number')) {
+            $orders = [$f3->get('POST.order_number')];
         } else {
             $orders = [];
             $file = $_FILES['upload']['tmp_name'];
@@ -28,14 +28,13 @@ class Create extends Index
                 $sheet = IOFactory::load($file)->getSheet(0);
                 $i = $sheet->getRowIterator();
                 while ($i->valid() && $orderNumber = $sheet->getCell('A' . $i->key())) {
-                    $orders[] = $orderNumber;
+                    $orders[] = trim($orderNumber);
                     $i->next();
                 }
-            } else {
-                $failure[] = "没有填写订单号";
             }
         }
         if ($orders) {
+            $shoeSize = new ShoeSize();
             $db = Mysql::instance()->get();
             $volume = new SqlMapper('volume_order');
             $product = new SqlMapper('virgo_product');
@@ -43,7 +42,7 @@ class Create extends Index
                 $query = $db->exec('select o.trace_id,o.size,o.channel,p.sku from order_item o,prototype p where o.trace_id=? and o.prototype_id=p.id', [$order]);
                 if ($query) {
                     $sku = $query[0]['sku'];
-                    $size = $query[0]['size'];
+                    $size = $shoeSize->convert($query[0]['size'], ShoeSize::EU);
                     $product->load(['sku=? and size=?', $sku, $size]);
                     if ($product->dry()) {
                         $failure[] = "$order: 找不到产品信息 $sku $size";
@@ -53,23 +52,26 @@ class Create extends Index
                     }
                 } else {
                     $volume->load(['volume_serial=?', $order]);
-                    while (!$volume->dry()) {
-                        $sku = $volume['sku'];
-                        $size = $volume['eu_size'];
-                        $product->load(['sku=? and size=?', $sku, $size]);
-                        if ($product->dry()) {
-                            $failure[] = "$order: 找不到产品信息 $sku $size";
-                        } else {
-                            $this->create($volume->cast(), $product->cast());
-                            $success[] = "$order: 导入成功 $sku $size {$volume['quantity']}";
+                    if ($volume->dry()) {
+                        $failure[] = "$order: 找不到订单";
+                    } else {
+                        while (!$volume->dry()) {
+                            $sku = $volume['sku'];
+                            $size = $volume['eu_size'];
+                            $product->load(['sku=? and size=?', $sku, $size]);
+                            if ($product->dry()) {
+                                $failure[] = "$order: 找不到产品信息 $sku $size";
+                            } else {
+                                $this->create($volume->cast(), $product->cast());
+                                $success[] = "$order: 导入成功 $sku $size {$volume['quantity']}";
+                            }
+                            $volume->next();
                         }
-                        $volume->next();
-                    }
-                    if (!$success) {
-                        $failure[] = "$order: 找不到对应的订单";
                     }
                 }
             }
+        } else {
+            $failure[] = "未填写订单号";
         }
         $f3->set('failure', $failure);
         $f3->set('success', $success);

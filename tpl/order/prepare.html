@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>材料检查</title>
+    <include href="common/header.html"/>
+    <style>
+        .btn-group {
+            margin: 2rem auto 1.5rem;
+        }
+        .fa {
+            cursor: pointer;
+        }
+        .img-thumbnail {
+            width: 75px;
+            cursor: pointer;
+            border: none;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .justify-content-center {
+            margin-left: 1rem;
+        }
+        .pagination {
+            margin-left: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <include href="order/navbar.html"/>
+    <div class="container-fluid">
+        <div class="btn-group btn-block">
+            <switch expr="{{@status}}">
+                <case value="0">
+                    <button class="btn btn-outline-primary btn-selected-check">已选订单物料计算</button>
+                </case>
+                <case value="1">
+                    <button class="btn btn-outline-primary btn-selected-check" data-redo=1>已选订单重新计算</button>
+                </case>
+                <case value="2">
+                    <button class="btn btn-outline-primary btn-selected-next">已选订单发往下料</button>
+                </case>
+            </switch>
+        </div>
+        <table class="table table-sm">
+            <thead class="thead-dark">
+            <tr>
+                <th>&nbsp;<i class="fa fa-mouse-pointer"></i></th>
+                <th>缩略图</th>
+                <th>订单</th>
+                <th>
+                    <select id="status" name="status">
+                        <option value="">Status</option>
+                        <option value="0">新建</option>
+                        <option value="8">等待计算</option>
+                        <option value="1">缺料</option>
+                        <option value="2">材料已扣减</option>
+                    </select>
+                </th>
+                <th>创建日期</th>
+                <th>SKU</th>
+                <th>尺码</th>
+                <th>总数</th>
+                <th></th>
+            </tr>
+            </thead>
+            <repeat group="{{@data}}" value="{{@item}}">
+                <tr>
+                    <td><input type="checkbox" data-number="{{@item['order_number']}}"/></td></td>
+                    <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
+                    <td>{{@item['order_number']}}</td>
+                    <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
+                    <td>{{@item['create_time']}}</td>
+                    <td>{{@item['sku']}}</td>
+                    <td>
+                        <repeat group="{{@item['volume']}}" value="{{@detail}}">
+                            {{@detail['size']}}: {{@detail['quantity']}}<br/>
+                        </repeat>
+                    </td>
+                    <td>{{@item['quantity']}}</td>
+                    <td>
+                        <div class="btn-group">
+                            <div class="btn btn-sm btn-outline-danger btn-cancel" data-number="{{@item['order_number']}}">取消订单</div>
+                            <switch expr="{{@item['status']}}">
+                                <case value="0">
+                                    <div class="btn btn-sm btn-outline-primary btn-check" data-number="{{@item['order_number']}}">物料计算</div>
+                                </case>
+                                <case value="1">
+                                    <div class="btn btn-sm btn-outline-secondary btn-check" data-number="{{@item['order_number']}}" data-redo=1>重新计算</div>
+                                </case>
+                                <case value="2">
+                                    <div class="btn btn-sm btn-outline-success btn-next" data-number="{{@item['order_number']}}">发往下料</div>
+                                </case>
+                            </switch>
+                        </div>
+                    </td>
+                </tr>
+            </repeat>
+        </table>
+    </div>
+    <nav>
+        <ul class="pagination justify-content-center"></ul>
+    </nav>
+<script src="{{@BASE}}/js/pagination.js"></script>
+<script>
+    let search = buildQuery({
+        status: "{{@status}}",
+    });
+    $(function () {
+        let status = "{{@status}}";
+        if (status === "") {
+            //TODO
+        } else {
+            $("select[name=status] option").each(function () {
+                if (status == $(this).val()) {
+                    $(this).prop("selected", true);
+                }
+            });
+        }
+        let selected = false;
+        $("ul.pagination").append(pagination("{{@BASE}}/order/Prepare?" + search + "&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
+        $("#status").on("change", function () {
+            $(this).after("<i class='fa fa-spinner fa-pulse animated'>&nbsp;</i>");
+            refresh();
+        });
+        $(".fa-mouse-pointer").on("click", function () {
+            selected = !selected;
+            $("input[type=checkbox]").prop("checked", selected ? "checked" : false);
+        });
+        $("input[type=checkbox]").on("click", function () {
+            selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
+        });
+        $(".btn-selected-check").on("click", function () {
+            let number = getSelected().join(',');
+            if (number) {
+                if (confirm("确认将已选择订单进行材料扣除?")) {
+                    exec({
+                        action: "check",
+                        number: number,
+                        redo: $(this).data("redo"),
+                    });
+                }
+            } else {
+                alert("没有选择任何订单");
+            }
+        });
+        $(".btn-selected-next").on("click", function () {
+            let number = getSelected().join(',');
+            if (number) {
+                if (confirm("确认将已选择订单发往下料?")) {
+                    exec({
+                        action: "next",
+                        number: number,
+                    });
+                }
+            } else {
+                alert("没有选择任何订单");
+            }
+        });
+        $(".btn-check").on("click", function () {
+            if (confirm("确认将订单进行材料扣减?")) {
+                exec({
+                    action: "check",
+                    number: $(this).data("number"),
+                    redo: $(this).data("redo"),
+                })
+            }
+        });
+        $(".btn-next").on("click", function () {
+            if (confirm("确认将订单发往下料?")) {
+                exec({
+                    action: "next",
+                    number: $(this).data("number")
+                })
+            }
+        });
+        $(".btn-cancel").on("click", function () {
+            if (confirm("确认取消订单? 任何条件下取消订单, 都不会自动恢复已经扣减的材料.")) {
+                $(".btn").attr("disabled", "disabled");
+                $.post("{{@BASE}}/order/Cancel", {
+                    number: $(this).data("number")
+                })
+                    .done(function (text) {
+                        alert(text);
+                        if (text === "success") {
+                            location.reload();
+                        }
+                    })
+                    .fail(generalCallback)
+                    .always(function () {
+                        $(".btn").removeAttr("disabled");
+                    })
+            }
+        });
+    })
+    function refresh() {
+        let update = buildQuery({
+            status: $("#status").val(),
+        });
+        if (search !== update) {
+            location.href = "{{@BASE}}/order/Prepare?" + update;
+        }
+    }
+    function exec(params) {
+        $(".btn").attr("disabled", "disabled");
+        $.post(location.href, params)
+            .done(function (text) {
+                alert(text);
+                if (text === "success") {
+                    location.reload();
+                }
+            })
+            .fail(generalCallback)
+            .always(function () {
+                $(".btn").removeAttr("disabled");
+            });
+    }
+    function getSelected() {
+        let number = [];
+        $("input[type=checkbox]").each(function () {
+            if ($(this).prop("checked")) {
+                number.push($(this).data("number"));
+            }
+        })
+        return number;
+    }
+</script>
+</body>
+</html>

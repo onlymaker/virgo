@@ -36,7 +36,7 @@ class Upload extends Index
                     $parse = [];
                     foreach ($name as $k => $v) {
                         $cell = chr(ord('A') + $k) . $i->key();
-                        $value = $sheet->getCell($cell)->getFormattedValue();
+                        $value = trim($sheet->getCell($cell)->getFormattedValue());
                         if ($v == 'size') {
                             $euSize = $shoeSize->convert($value, ShoeSize::EU);
                             if (in_array($euSize, $shoeSize->available()['EU'])) {

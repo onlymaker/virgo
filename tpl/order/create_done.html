@@ -26,7 +26,7 @@
     $(function () {
         $(".btn-back").on("click", function () {
             if (confirm("确认离开当前页面?")) {
-                location.href = "{{@BASE}}/order/Create";
+                location.href = "{{@BASE}}/order/Prepare?status=0";
             }
         });
     })
