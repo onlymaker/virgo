@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>订单管理</title>
+    <include href="common/header.html"/>
+    <style>
+        .container {
+            margin: 50px auto;
+            display: flex;
+            justify-content: center;
+        }
+        .container .card {
+            margin-right: 50px;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMenuWrapper" aria-controls="navbarMenuWrapper" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="/">
+            <img src="//qiniu.syncxplus.com/logo/jibo.png?imageView2/0/w/30" width="30" height="30" class="d-inline-block align-top"/>
+        </a>
+        <div class="collapse navbar-collapse" id="navbarMenuWrapper">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="{{@BASE}}/order/Index">订单管理</a>
+            </div>
+        </div>
+        <a class="nav-item nav-link" href="{{@BASE}}/"><i class="fa fa-chevron-left">&nbsp;</i>返回</a>
+    </nav>
+    <div class="container">
+        <div class="card-columns">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">添加订单</h5>
+                    <p class="card-text"></p>
+                    <a href="{{@BASE}}/order/Create" class="btn btn-primary">进入</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">材料检查</h5>
+                    <p class="card-text"></p>
+                    <a href="{{@BASE}}/order/Prepare" class="btn btn-primary">进入</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">下料</h5>
+                    <p class="card-text"></p>
+                    <a href="{{@BASE}}/order/Alloc" class="btn btn-primary">进入</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">面部</h5>
+                    <p class="card-text"></p>
+                    <a href="{{@BASE}}/order/Upper" class="btn btn-primary">进入</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">底部</h5>
+                    <p class="card-text"></p>
+                    <a href="{{@BASE}}/order/Sole" class="btn btn-primary">进入</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">QC</h5>
+                    <p class="card-text"></p>
+                    <a href="{{@BASE}}/order/Qc" class="btn btn-primary">进入</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">出货</h5>
+                    <p class="card-text"></p>
+                    <a href="{{@BASE}}/order/Finish" class="btn btn-primary">进入</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

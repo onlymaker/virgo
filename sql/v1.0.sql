@@ -91,3 +91,78 @@ create table virgo_material_history
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
+
+drop table if exists virgo_order;
+create table virgo_order
+(
+    id            bigint unsigned primary key auto_increment,
+    sku           varchar(50),
+    size          varchar(50),
+    image         varchar(500),
+    quantity      int unsigned       default 1,
+    order_type    tinyint unsigned   default 0 comment '0:single,1:volume',
+    order_sponsor varchar(50),
+    order_channel varchar(50),
+    order_number  varchar(50),
+    status        tinyint unsigned   default 0,
+    create_time   timestamp not null default current_timestamp,
+    update_time   timestamp default '2020-01-01',
+    index (sku),
+    index (size),
+    index (order_number),
+    index (create_time)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+drop trigger if exists tri_virgo_order;
+create trigger tri_virgo_order
+    before update
+    on virgo_order
+    for each row set new.update_time = current_timestamp;
+
+drop table if exists virgo_order_history;
+create table virgo_order_history
+(
+    id            bigint unsigned primary key auto_increment,
+    sku           varchar(50),
+    size          varchar(50),
+    image         varchar(500),
+    quantity      int unsigned       default 1,
+    order_type    tinyint unsigned   default 0 comment '0:single,1:volume',
+    order_sponsor varchar(50),
+    order_channel varchar(50),
+    order_number  varchar(50),
+    status        tinyint unsigned   default 0,
+    description   text,
+    create_time   timestamp not null default current_timestamp,
+    index (sku),
+    index (size),
+    index (order_number),
+    index (create_time)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+drop table if exists virgo_order_qc;
+create table virgo_order_qc
+(
+    id            bigint unsigned primary key auto_increment,
+    sku           varchar(50),
+    size          varchar(50),
+    image         varchar(500),
+    quantity      int unsigned       default 1,
+    rejected      int unsigned       default 1,
+    order_type    tinyint unsigned   default 0 comment '0:single,1:volume',
+    order_sponsor varchar(50),
+    order_channel varchar(50),
+    order_number  varchar(50),
+    description   text,
+    create_time   timestamp not null default current_timestamp,
+    index (sku),
+    index (size),
+    index (order_number),
+    index (create_time)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加订单</title>
+    <include href="common/header.html"/>
+    <style>
+        .container {
+            margin: 50px auto;
+        }
+        .form-control {
+            margin: 25px auto;
+        }
+    </style>
+</head>
+<body>
+<include href="order/navbar.html"/>
+<div class="container">
+    <div class="alert alert-primary" role="alert">
+        请填写订单号或者上传订单号; 若两者同时填写: 手动优先，上传文件无效
+    </div>
+    <form id="upload-form" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <input class="form-control" type="text" name="order_number" placeholder="订单号"/>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="file" name="upload"/>
+        </div>
+        <button class="btn btn-block btn-outline-primary" type="submit">添加</button>
+    </form>
+</div>
+</body>
+</html>

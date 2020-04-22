@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>上传结果</title>
+    <include href="common/header.html"/>
+    <style>
+        .container {
+            margin: 50px auto;
+        }
+    </style>
+</head>
+<body>
+<include href="order/navbar.html"/>
+<div class="container">
+    <table class="table table-borderless">
+    <repeat group="{{@failure}}" value="{{@value}}">
+        <tr class="text-danger"><td>{{@value}}</td></tr>
+    </repeat>
+    <repeat group="{{@success}}" value="{{@value}}">
+        <tr class="text-success"><td>{{@value}}</td></tr>
+    </repeat>
+    </table>
+    <div class="btn btn-block btn-outline-primary btn-back">返回</div>
+</div>
+<script>
+    $(function () {
+        $(".btn-back").on("click", function () {
+            if (confirm("确认离开当前页面?")) {
+                location.href = "{{@BASE}}/order/Create";
+            }
+        });
+    })
+</script>
+</body>
+</html>
