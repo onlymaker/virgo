@@ -24,7 +24,7 @@ class Upload extends Index
             die('File is too large');
         }
         try {
-            $shoeSize = new ShoeSize();
+            $shoeSize = ShoeSize::instance();
             $sheet = IOFactory::load($_FILES['upload']['tmp_name'])->getSheet(0);
             $column = $sheet->getHighestColumn(1);
             $name = array_keys(Code::PRODUCT_SCHEMA);

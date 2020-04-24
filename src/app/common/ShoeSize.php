@@ -2,7 +2,7 @@
 
 namespace app\common;
 
-class ShoeSize
+class ShoeSize extends \Prefab
 {
     const US = 'US';
     const EU = 'EU';

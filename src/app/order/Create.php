@@ -34,7 +34,7 @@ class Create extends Index
             }
         }
         if ($orders) {
-            $shoeSize = new ShoeSize();
+            $shoeSize = ShoeSize::instance();
             $db = Mysql::instance()->get();
             $volume = new SqlMapper('volume_order');
             $product = new SqlMapper('virgo_product');
