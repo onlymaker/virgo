@@ -2,6 +2,7 @@
 
 namespace app\order;
 
+use app\common\Image;
 use app\common\OrderStatus;
 use db\Mysql;
 
@@ -15,7 +16,7 @@ class Alloc extends Index
         } else {
             $pageNo = 1;
         }
-        $pageSize = 100;
+        $pageSize = 25;
         $params = [];
         $filter = [];
         foreach ($_GET as $name => $value) {
@@ -33,6 +34,10 @@ class Alloc extends Index
         list($count) = $db->exec("select count(distinct order_number) total from virgo_order $where");
         $offset = ($pageNo - 1) * $pageSize;
         $data = $db->exec("select sku,image,order_number,order_type,status,sum(quantity) quantity from virgo_order $where group by order_number order by id desc limit $pageSize offset $offset", $params) ?: [];
+        $helper = Image::instance();
+        foreach ($data as &$value) {
+            $value['qrcode'] = $helper->qrcode($value['order_number'])['url'];
+        }
         $f3->set('pageNo', $pageNo);
         $f3->set('pageCount', ceil($count['total'] / $pageSize));
         $f3->set('data', $data);

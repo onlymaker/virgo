@@ -60,7 +60,7 @@ class Upload extends Index
                 if ($sku) {
                     $filter = implode("','", $sku);
                     Mysql::instance()->get()->exec(<<<SQL
-update virgo_product v inner join (select sku,thumb from prototype) p on v.sku in ('$filter') and v.sku=p.sku set v.image=p.thumb
+update virgo_product v inner join (select sku,thumb,images from prototype) p on v.sku in ('$filter') and v.sku=p.sku set v.image=p.thumb,v.images=p.images
 SQL
                     );
                 }

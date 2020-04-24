@@ -36,11 +36,9 @@ class Update extends Index
     function image(\Base $f3)
     {
         $sku = $f3->get('POST.sku');
-        $prototype = new SqlMapper('prototype');
-        $prototype->load(['sku=?', $sku]);
-        if (!$prototype->dry() && $prototype['thumb']) {
-            Mysql::instance()->get()->exec('update virgo_product set image=? where sku=?', [$prototype['thumb'], $sku]);
-        }
+        Mysql::instance()->get()->exec(<<<SQL
+update virgo_product v inner join (select sku,thumb,images from prototype) p on v.sku=? and v.sku=p.sku set v.image=p.thumb,v.images=p.images
+SQL, [$sku]);
         echo 'success';
     }
 

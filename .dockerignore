@@ -4,4 +4,6 @@
 /.gitignore
 /.git
 /html/php.ini
+/html/barcode
+/html/qrcode
 /runtime

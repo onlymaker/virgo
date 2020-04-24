@@ -5,6 +5,7 @@ create table virgo_product
     sku         varchar(50),
     size        varchar(50),
     image       varchar(500),
+    images      text,
     last        varchar(500),
     fabric_1    varchar(500),
     fabric_2    varchar(500),
