@@ -150,7 +150,6 @@ create table virgo_order_qc
 (
     id            bigint unsigned primary key auto_increment,
     sku           varchar(50),
-    size          varchar(50),
     image         varchar(500),
     quantity      int unsigned       default 1,
     rejected      int unsigned       default 1,
@@ -161,7 +160,6 @@ create table virgo_order_qc
     description   text,
     create_time   timestamp not null default current_timestamp,
     index (sku),
-    index (size),
     index (order_number),
     index (create_time)
 ) engine = InnoDB

@@ -60,7 +60,7 @@
 <script src="{{@BASE}}/js/pagination.js"></script>
 <script>
     $(function () {
-        $("ul.pagination").append(pagination("{{@BASE}}/order/Index?" + search + "&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
+        $("ul.pagination").append(pagination("{{@BASE}}/order/Index?pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
     })
 </script>
 </body>

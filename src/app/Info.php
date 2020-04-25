@@ -33,4 +33,12 @@ class Info
             $f3->error(404, "找不到订单 $code");
         }
     }
+
+    function summary(\Base $f3)
+    {
+        $number = $f3->get('REQUEST.number');
+        $db = Mysql::instance()->get();
+        list($summary) = $db->exec('select sku,image,sum(quantity) quantity from virgo_order where order_number=? group by sku,image', [$number]);
+        echo json_encode($summary, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
 }

@@ -16,7 +16,7 @@ class Prepare extends Index
         } else {
             $pageNo = 1;
         }
-        $pageSize = 100;
+        $pageSize = 25;
         $params = [];
         $filter = [];
         foreach ($_GET as $name => $value) {

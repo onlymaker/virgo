@@ -12,8 +12,10 @@
         }
         .img-thumbnail {
             width: 75px;
-            cursor: pointer;
             border: none;
+        }
+        .img-fluid {
+            width: 125px;
         }
         .table td {
             vertical-align: middle;
@@ -41,9 +43,10 @@
                 <th>缩略图</th>
                 <th>订单</th>
                 <th>状态</th>
-                <th>创建日期</th>
                 <th>SKU</th>
                 <th>总数</th>
+                <th>创建日期</th>
+                <th>二维码</th>
                 <th></th>
             </tr>
             </thead>
@@ -53,9 +56,10 @@
                     <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
                     <td>{{@item['order_number']}}</td>
                     <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
-                    <td>{{@item['create_time']}}</td>
                     <td>{{@item['sku']}}</td>
                     <td>{{@item['quantity']}}</td>
+                    <td>{{@item['create_time']}}</td>
+                    <td><img src="{{@item['qrcode']}}" alt="{{@item['order_number']}}" class="img-fluid"/></td>
                     <td>
                         <div class="btn-group">
                             <div class="btn btn-sm btn-outline-danger btn-cancel" data-number="{{@item['order_number']}}">取消订单</div>
