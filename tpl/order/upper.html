@@ -32,8 +32,7 @@
     <include href="order/navbar.html"/>
     <div class="container-fluid">
         <div class="btn-group btn-block">
-            <button class="btn btn-outline-primary btn-selected-export">导出下料信息</button>
-            <button class="btn btn-outline-primary btn-selected-barcode">打印二维码</button>
+            <button class="btn btn-outline-primary btn-selected-pick">扫码捡料</button>
             <button class="btn btn-outline-primary btn-selected-next">发往底部</button>
         </div>
         <table class="table table-sm">
@@ -84,29 +83,8 @@
         $("input[type=checkbox]").on("click", function () {
             selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
         });
-        $(".btn-selected-export").on("click", function () {
-            let number = getSelected().join(',');
-            if (number) {
-                let params = {
-                    action: "export",
-                    number: number,
-                };
-                post(location.href, params, "_blank");
-            } else {
-                alert("没有选择任何订单");
-            }
-        });
-        $(".btn-selected-barcode").on("click", function () {
-            let number = getSelected().join(',');
-            if (number) {
-                let params = {
-                    action: "barcode",
-                    number: number,
-                };
-                post(location.href, params, "_blank");
-            } else {
-                alert("没有选择任何订单");
-            }
+        $(".btn-selected-pick").on("click", function () {
+            location.href = "{{@BASE}}/order/Pick";
         });
         $(".btn-selected-next").on("click", function () {
             let number = getSelected().join(',');

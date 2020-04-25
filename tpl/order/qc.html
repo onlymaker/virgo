@@ -29,23 +29,12 @@
 <include href="order/navbar.html"/>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-2">
-            <div class="form-group">
-                <select id="mode" class="form-control">
-                    <option value="">扫码</option>
-                    <option value="manual">手动</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-4">
+        <div class="col-6">
             <div class="input-group">
                 <div class="input-group-prepend">
                     <div class="input-group-text">单号</div>
                 </div>
                 <input type="text" name="order_number" class="form-control"/>
-                <div class="input-group-append">
-                    <button id="btn-query" type="button" class="btn btn-outline-primary">查找</button>
-                </div>
             </div>
         </div>
     </div>
@@ -108,64 +97,39 @@
 </div>
 <script src="{{@BASE}}/js/pagination.js"></script>
 <script>
-    let interval = 5000;
-    let robot = false;
-    let auto = ("{{@mode == ''}}");
-    let search = buildQuery({
-        mode: "{{@mode}}",
-    });
-    function scanOrderNumber() {
-        let number = $("input[name=order_number]").val();
+    let input = $("input[name=order_number]");
+    function queryOrder() {
+        let number = input.val();
         if (number) {
-            queryOrder(number);
-        }
-    }
-    function queryOrder(number) {
-        $.get("{{@BASE}}/info/summary?number=" + number)
-            .done(function (data) {
-                if (isJsonString(data)) {
-                    let json = JSON.parse(data);
-                    $("#process .modal-title").text(number);
-                    $("#process .td-sku").text(json.sku);
-                    $("#process .td-img").html("<img class='img-thumbnail' src='" + json.image + "'/>");
-                    $("#process .td-quantity").text("总数:" + json.quantity);
-                    if (json.quantity == 1) {
-                        $("input[name=rejected]").val(1);
+            $.get("{{@BASE}}/info/summary?number=" + number)
+                .done(function (data) {
+                    console.log(data);
+                    if (isJsonString(data)) {
+                        let json = JSON.parse(data);
+                        $("#process .modal-title").text(number);
+                        $("#process .td-sku").text(json.sku);
+                        $("#process .td-img").html("<img class='img-thumbnail' src='" + json.image + "'/>");
+                        $("#process .td-quantity").text("总数:" + json.quantity);
+                        if (json.quantity == 1) {
+                            $("input[name=rejected]").val(1);
+                        }
+                        $("#process").modal({
+                            backdrop: "static",
+                            keyboard: false,
+                            show: true,
+                        });
+                    } else {
+                        alert(data);
                     }
-                    $("#process").modal({
-                        backdrop: "static",
-                        keyboard: false,
-                        show: true,
-                    });
-                } else {
-                    alert(data);
-                    reset();
-                }
-            })
-            .fail(generalCallback)
-            .always();
-    }
-    function reset() {
-        $("input[name=order_number]").val("").focus();
-        if (auto) {
-            robot = setTimeout(scanOrderNumber, interval);
-        }
-    }
-    function refresh() {
-        let update = buildQuery({
-            mode: $("#mode").val(),
-        });
-        if (search !== update) {
-            location.href = "{{@BASE}}/order/QC?" + update;
+                })
+                .fail(generalCallback)
+                .always(function () {
+                    input.val("").focus();
+                });
         }
     }
     $(function () {
-        if ("{{@mode == ''}}") {
-            $("input[name=order_number]").focus();
-            robot = setTimeout(scanOrderNumber, interval);
-        }
-        $("#mode option[value='{{@mode}}']").prop("selected", true);
-        $("#mode").on("change", refresh);
+        input.focus().on("change", queryOrder);
         $("#btn-cancel").on("click", function () {
             $("#process .modal-title").text("");
             $("#process .td-sku").text("");
@@ -173,25 +137,20 @@
             $("#process .td-quantity").text("");
             $("input[name=rejected]").val("");
             $("#process").modal("hide");
-            reset();
         });
         $("#btn-reject").on("click", function () {
-            post(location.href, {
-                number: $("input[name=order_number]").val(),
-                rejected: $("input[name=rejected]").val(),
-                description: $("textarea").val(),
-            })
-        });
-        $("#btn-query").on("click", function () {
-            if (robot) {
-                clearTimeout(robot);
-            }
-            let number = $("input[name=order_number]").val();
-            if (number) {
-                queryOrder(number);
+            let rejected = $("input[name=rejected]").val();
+            if (rejected) {
+                post(location.href, {
+                    number: $("input[name=order_number]").val(),
+                    rejected: rejected,
+                    description: $("textarea").val(),
+                })
+            } else {
+                alert("问题数量不能为0");
             }
         });
-        $("ul.pagination").append(pagination("{{@BASE}}/order/QC?" + search + "&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
+        $("ul.pagination").append(pagination("{{@BASE}}/order/QC?pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
     })
 </script>
 </body>

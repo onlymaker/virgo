@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>扫码捡料</title>
+    <include href="common/header.html"/>
+    <style>
+        .container {
+            padding-top: 1.5rem;
+        }
+        table {
+            margin: 1.5rem auto 1rem;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMenuWrapper" aria-controls="navbarMenuWrapper" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="/">
+        <img src="//qiniu.syncxplus.com/logo/jibo.png?imageView2/0/w/30" width="30" height="30" class="d-inline-block align-top"/>
+    </a>
+    <div class="collapse navbar-collapse" id="navbarMenuWrapper">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link" href="{{@BASE}}/order/Upper"><i class="fa fa-chevron-left">&nbsp;</i>返回</a>
+        </div>
+    </div>
+</nav><div class="container">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <div class="input-group-text">单号</div>
+        </div>
+        <input type="text" name="order_number" class="form-control"/>
+    </div>
+    <table class="table table-striped"></table>
+    <div class="btn btn-block btn-primary btn-pick">生成捡料方案</div>
+</div>
+<script>
+    let input = $("input[name=order_number]");
+    function add() {
+        let order = input.val();
+        if (order) {
+            $("table").append("<tr><td>" + order + "</td><td><div class='btn btn-sm btn-danger' onclick='remove($(this))'>删除</div></td></tr>");
+            input.val("");
+        }
+    }
+    function remove(o) {
+        o.parent().parent().remove();
+        input.focus();
+    }
+    $(function () {
+        input.focus().on("change", add);
+        $(".btn-pick").on("click", function () {
+            let number = [];
+            $("tr").each(function () {
+                let value = $(this).find("td").eq(0).text();
+                if (number.indexOf(value) === -1) {
+                    number.push(value);
+                }
+            });
+            if (number.length === 0) {
+                alert("请输入订单号");
+            } else if (number.length > 6) {
+                alert("最多输入6个订单号");
+            } else {
+                post(location.href, {
+                    number: number.join(","),
+                })
+            }
+        })
+    })
+</script>
+</body>
+</html>

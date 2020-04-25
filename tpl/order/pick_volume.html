@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>扫码捡料</title>
+    <include href="common/header.html"/>
+    <style>
+        .container {
+            padding-top: 1.5rem;
+        }
+        table {
+            margin: 1.5rem auto 1rem;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMenuWrapper" aria-controls="navbarMenuWrapper" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="/">
+        <img src="//qiniu.syncxplus.com/logo/jibo.png?imageView2/0/w/30" width="30" height="30" class="d-inline-block align-top"/>
+    </a>
+    <div class="collapse navbar-collapse" id="navbarMenuWrapper">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link" href="{{@BASE}}/order/Pick"><i class="fa fa-chevron-left">&nbsp;</i>返回</a>
+        </div>
+    </div>
+</nav><div class="container">
+    <p class="h1">{{@materials[0]['order']}}</p>
+    <table class="table table-striped">
+        <repeat group="{{@materials}}" value="{{@value}}">
+        <tr>
+            <td>货架: {{@value['location']}}</td>
+            <td>型号: {{@value['value']}} ({{@value['name']}})</td>
+            <td>数量: {{@value['quantity']}}</td>
+            <td>箱号: {{@value['i']}}</td>
+        </tr>
+        </repeat>
+    </table>
+</div>
+<script>
+</script>
+</body>
+</html>

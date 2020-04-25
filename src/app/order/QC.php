@@ -16,9 +16,6 @@ class QC extends Index
         } else {
             $pageNo = 1;
         }
-        foreach ($_GET as $name => $value) {
-            $f3->set($name, $value);
-        }
         $pageSize = 100;
         $qc = new SqlMapper('virgo_order_qc');
         $page = $qc->paginate($pageNo-1, $pageSize, null, ['order' => 'id desc']);
