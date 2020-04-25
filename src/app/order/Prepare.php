@@ -27,7 +27,7 @@ class Prepare extends Index
         if ($filter) {
             $where = 'where' . implode(' and ', $filter);
         } else {
-            $where = 'where status in (' . implode(',', [OrderStatus::INITIAL, OrderStatus::PREPARING, OrderStatus::PREPARED]) . ')';
+            $where = 'where status in (' . implode(',', [OrderStatus::INITIAL, OrderStatus::PREPARING, OrderStatus::PREPARED, OrderStatus::WAITING]) . ')';
         }
         $db = Mysql::instance()->get();
         $mapper = new SqlMapper('virgo_order');

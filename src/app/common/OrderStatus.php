@@ -25,13 +25,13 @@ class OrderStatus extends \Prefab
         return [
             self::INITIAL => '新建',
             self::PREPARING => '缺料',
-            self::PREPARED => '材料已扣减',
+            self::PREPARED => '材料备齐',
             self::ALLOCATED => '下料',
             self::UPPER => '面部',
             self::SOLE => '底部',
             self::FINISH => '出货',
             self::CANCEL => '取消',
-            self::WAITING => '等待材料核算',
+            self::WAITING => '材料计算',
         ];
     }
 }

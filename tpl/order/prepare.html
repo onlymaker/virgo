@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>材料检查</title>
+    <title>材料准备</title>
     <include href="common/header.html"/>
     <style>
         .btn-group {
@@ -52,15 +52,15 @@
                     <select id="status" name="status">
                         <option value="">Status</option>
                         <option value="0">新建</option>
-                        <option value="8">等待计算</option>
+                        <option value="8">材料计算</option>
                         <option value="1">缺料</option>
-                        <option value="2">材料已扣减</option>
+                        <option value="2">材料备齐</option>
                     </select>
                 </th>
-                <th>创建日期</th>
                 <th>SKU</th>
                 <th>尺码</th>
                 <th>总数</th>
+                <th>创建日期</th>
                 <th></th>
             </tr>
             </thead>
@@ -70,7 +70,6 @@
                     <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
                     <td>{{@item['order_number']}}</td>
                     <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
-                    <td>{{@item['create_time']}}</td>
                     <td>{{@item['sku']}}</td>
                     <td>
                         <repeat group="{{@item['volume']}}" value="{{@detail}}">
@@ -78,20 +77,10 @@
                         </repeat>
                     </td>
                     <td>{{@item['quantity']}}</td>
+                    <td>{{@item['create_time']}}</td>
                     <td>
                         <div class="btn-group">
                             <div class="btn btn-sm btn-outline-danger btn-cancel" data-number="{{@item['order_number']}}">取消订单</div>
-                            <switch expr="{{@item['status']}}">
-                                <case value="0">
-                                    <div class="btn btn-sm btn-outline-primary btn-check" data-number="{{@item['order_number']}}">物料计算</div>
-                                </case>
-                                <case value="1">
-                                    <div class="btn btn-sm btn-outline-secondary btn-check" data-number="{{@item['order_number']}}" data-redo=1>重新计算</div>
-                                </case>
-                                <case value="2">
-                                    <div class="btn btn-sm btn-outline-success btn-next" data-number="{{@item['order_number']}}">发往下料</div>
-                                </case>
-                            </switch>
                         </div>
                     </td>
                 </tr>
@@ -155,23 +144,6 @@
                 }
             } else {
                 alert("没有选择任何订单");
-            }
-        });
-        $(".btn-check").on("click", function () {
-            if (confirm("确认将订单进行材料扣减?")) {
-                exec({
-                    action: "check",
-                    number: $(this).data("number"),
-                    redo: $(this).data("redo"),
-                })
-            }
-        });
-        $(".btn-next").on("click", function () {
-            if (confirm("确认将订单发往下料?")) {
-                exec({
-                    action: "next",
-                    number: $(this).data("number")
-                })
             }
         });
         $(".btn-cancel").on("click", function () {
