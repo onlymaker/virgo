@@ -41,4 +41,13 @@ class Info
         list($summary) = $db->exec('select sku,image,sum(quantity) quantity from virgo_order where order_number=? group by sku,image', [$number]);
         echo json_encode($summary, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
+
+    function service()
+    {
+        $windows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        $command = $windows ? 'tasklist /v | findstr background.php' : 'ps -ef|grep background.php';
+        $status = [];
+        exec($command, $status);
+        print_r($status);
+    }
 }

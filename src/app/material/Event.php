@@ -57,6 +57,21 @@ class Event extends \Prefab
         $history->save();
     }
 
+    function usage(array $current, string $order, int $quantity)
+    {
+        $history = new SqlMapper('virgo_material_history');
+        $history['name'] = $current['name'];
+        $history['type'] = $current['type'];
+        $history['event'] = $this->toJson([
+            'name' => 'usage',
+            'serial' => $order
+        ]);
+        $history['previous'] = $this->toJson($current);
+        $current['quantity'] -= $quantity;
+        $history['current'] = $this->toJson($current);
+        $history->save();
+    }
+
     private function toJson(array $data)
     {
         return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
