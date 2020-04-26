@@ -84,7 +84,18 @@
             selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
         });
         $(".btn-selected-pick").on("click", function () {
-            location.href = "{{@BASE}}/order/Pick";
+            let numbers = getSelected();
+            if (numbers.length > 0) {
+                if (numbers.length > 6) {
+                    alert("最多选择6个散单或者1个小批量单");
+                } else {
+                    post("{{@BASE}}/order/Pick", {
+                        number: numbers.join(","),
+                    })
+                }
+            } else {
+                location.href = "{{@BASE}}/order/Pick";
+            }
         });
         $(".btn-selected-next").on("click", function () {
             let number = getSelected().join(',');

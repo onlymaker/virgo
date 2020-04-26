@@ -26,13 +26,24 @@
         </div>
     </div>
 </nav><div class="container">
-    <table class="table table-striped">
-        <repeat group="{{@materials}}" value="{{@value}}">
+    <p class="h2">散单</p>
+    <table class="table">
+        <thead class="table-active">
         <tr>
-            <td>货架: {{@value['location']}}</td>
-            <td>型号: {{@value['value']}} ({{@value['name']}})</td>
-            <td>箱号: {{@value['i']}}</td>
-            <td>单号: {{@value['order']}}</td>
+            <th>#</th>
+            <th>货架位置</th>
+            <th>材料</th>
+            <th>箱号</th>
+            <th>订单号</th>
+        </tr>
+        </thead>
+        <repeat group="{{@materials}}" value="{{@value}}" counter="{{@cnt}}">
+        <tr>
+            <td>{{@cnt}}</td>
+            <td>{{@value['location']}}</td>
+            <td>{{@value['value']}} ({{@value['name']}})</td>
+            <td>{{@value['i']}}</td>
+            <td>{{@value['order']}}</td>
         </tr>
         </repeat>
     </table>
