@@ -8,7 +8,7 @@ class Next extends \Prefab
 {
     function move($number, $current, $next, $message)
     {
-        $format = implode("','", $number);
+        $format = is_array($number) ? implode("','", $number) : $number;
         $db = Mysql::instance()->get();
         $db->begin();
         $db->exec([
