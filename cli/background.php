@@ -3,6 +3,7 @@
 use app\common\Code;
 use app\common\OrderStatus;
 use app\material\Event;
+use app\material\Threshold;
 use app\order\Next;
 use db\Mysql;
 use db\SqlMapper;
@@ -66,6 +67,7 @@ function materialUsage(array $order, array $product)
     $logger = Base::instance()->get('LOGGER');
     $history = Event::instance();
     $material = new SqlMapper('virgo_material');
+    $threshold = (new Threshold())->current();
     foreach ($product as $field => $value) {
         if ($value) {
             $material->load(['name=?', $value]);
@@ -79,8 +81,7 @@ function materialUsage(array $order, array $product)
                 $logger->write("order material not found: {$order['order_number']}, $field, $value");
                 return false;
             } else {
-                //TODO: check the real threshold
-                if ($material['quantity'] > $order['quantity']) {
+                if ($material['quantity'] > $threshold[$field]) {
                     $history->usage($material->cast(), $order['order_number'], $order['quantity']);
                     $material['quantity'] -= $order['quantity'];
                     $material->save();

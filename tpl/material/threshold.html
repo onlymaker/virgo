@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>最小数量设置</title>
+    <include href="common/header.html"/>
+    <style>
+    </style>
+</head>
+<body>
+    <include href="material/navbar.html"/>
+    <div class="container-fluid">
+        <table class="table table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th>类别</th>
+                <th>告警值</th>
+                <th></th>
+            </tr>
+            </thead>
+            <repeat group="{{@data}}" key="{{@i}}" value="{{@item}}">
+            <tr>
+                <td>{{@item["value"]}}</td>
+                <td>{{@item["threshold"]}}</td>
+                <td style="width:200px">
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{@name}}"/>
+                        <div class="input-group-append">
+                            <div class="btn btn-primary btn-submit" data-name="{{@item['name']}}">修改</div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </repeat>
+        </table>
+    </div>
+<script>
+    $(function () {
+        $(".btn-submit").on("click", function () {
+            let prev = $(this).parent().parent().parent().prev().text();
+            let value = $(this).parent().prev().val();
+            if (value && prev != value) {
+                post(location.href, {
+                    name: $(this).data("name"),
+                    threshold: value
+                })
+            }
+        })
+    })
+</script>
+</body>
+</html>

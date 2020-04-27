@@ -58,6 +58,34 @@ create table virgo_material
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
 
+drop table if exists virgo_material_threshold;
+create table virgo_material_threshold
+(
+    id        bigint unsigned primary key auto_increment,
+    name      varchar(200),
+    value     varchar(200),
+    threshold tinyint unsigned default 1,
+    index (name)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+insert into virgo_material_threshold (name, value)
+values ("fabric_1", "面料1"),
+       ("fabric_2", "面料2"),
+       ("fabric_3", "面料3"),
+       ("lining_1", "内里1"),
+       ("lining_2", "内里2"),
+       ("lining_3", "内里3"),
+       ("platform", "水台"),
+       ("heel", "跟"),
+       ("surround", "包料"),
+       ("midsole", "中底"),
+       ("outsole", "大底"),
+       ("insole", "膛底"),
+       ("lace", "鞋带"),
+       ("accessory_1", "扣件1"),
+       ("accessory_2", "扣件2");
+
 drop table if exists virgo_material_order;
 create table virgo_material_order
 (

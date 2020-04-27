@@ -42,12 +42,16 @@ class Info
         echo json_encode($summary, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
-    function service()
+    function service(\Base $f3)
     {
-        $windows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        $command = $windows ? 'tasklist /v | findstr background.php' : 'ps -ef|grep background.php';
         $status = [];
-        exec($command, $status);
+        if ($f3->get('VERB') === 'POST') {
+            exec('nohup php /var/www/cli/background.php &', $status);
+        } else {
+            $windows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+            $command = $windows ? 'tasklist /v | findstr background.php' : 'ps -ef|grep background.php';
+            exec($command, $status);
+        }
         print_r($status);
     }
 }
