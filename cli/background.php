@@ -23,7 +23,7 @@ while (true) {
             $type = $order['order_type'];
             $sku = $order['sku'];
             $fields = implode(',', array_flip(Code::PRODUCT_MATERIAL));
-            $logger->write("order material check: $number, type: $type");
+            $logger->write("\norder material check: $number, type: $type");
             $db->begin();
             if ($type) {
                 $queryVolume = $db->exec("select $fields from virgo_product where sku='$sku' order by size");
