@@ -11,7 +11,10 @@ use db\SqlMapper;
 require_once __DIR__ . '/index.php';
 
 $f3 = Base::instance();
-$logger = $f3->get('LOGGER');
+$f3->set('LOGS', RUNTIME . '/bg/');
+$f3->set('BG_LOG', new Log(date('Y-m-d.\l\o\g')));
+
+logging('Starting background task ...');
 
 while (true) {
     try {
@@ -24,7 +27,7 @@ while (true) {
             $type = $order['order_type'];
             $sku = $order['sku'];
             $fields = implode(',', array_flip(Code::PRODUCT_MATERIAL));
-            $logger->write("\norder material check: $number, type: $type");
+            logging("\norder material check: $number, type: $type");
             $db->begin();
             if ($type) {
                 $queryVolume = $db->exec("select $fields from virgo_product where sku='$sku' order by size");
@@ -49,22 +52,23 @@ READY:
             if ($ready) {
                 $db->commit();
                 Next::instance()->move($number, OrderStatus::WAITING, OrderStatus::PREPARED, '材料齐备');
-                $logger->write("order material ready: $number, type: $type");
+                logging("order material ready: $number, type: $type");
             } else {
                 $db->rollback();
                 Next::instance()->move($number, OrderStatus::WAITING, OrderStatus::PREPARING, '材料不齐全');
-                $logger->write("order material not ready: $number, type: $type");
+                logging("order material not ready: $number, type: $type");
             }
+        } else {
+            logging("No more orders");
         }
         sleep(60);
     } catch (Exception $e) {
-        $logger->write($e->getTraceAsString());
+        logging($e->getTraceAsString());
     }
 }
 
 function materialUsage(array $order, array $product)
 {
-    $logger = Base::instance()->get('LOGGER');
     $history = Event::instance();
     $material = new SqlMapper('virgo_material');
     $threshold = (new Threshold())->current();
@@ -78,7 +82,7 @@ function materialUsage(array $order, array $product)
                 }
             }
             if ($material->dry()) {
-                $logger->write("order material not found: {$order['order_number']}, $field, $value");
+                logging("order material not found: {$order['order_number']}, $field, $value");
                 return false;
             } else {
                 if ($material['quantity'] > $threshold[$field]) {
@@ -86,7 +90,7 @@ function materialUsage(array $order, array $product)
                     $material['quantity'] -= $order['quantity'];
                     $material->save();
                 } else {
-                    $logger->write("order material not enough: {$order['order_number']}, $field, $value");
+                    logging("order material not enough: {$order['order_number']}, $field, $value");
                     return false;
                 }
             }
@@ -95,4 +99,10 @@ function materialUsage(array $order, array $product)
     return true;
 }
 
-$logger->write('Schedule task ends');
+function logging($message) {
+    global $f3;
+    echo $message, "\n";
+    $f3->get('BG_LOG')->write($message);
+}
+
+logging('Exit background task');

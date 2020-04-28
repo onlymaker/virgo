@@ -7,6 +7,17 @@ use db\SqlMapper;
 
 class Info
 {
+    function background(\Base $f3)
+    {
+        $dir = RUNTIME . '/bg/';
+        if (is_dir($dir)) {
+            $files = glob($dir . '/*[0-9].log');
+            \Web::instance()->send(end($files));
+        } else {
+            $f3->error(404, 'No background dir');
+        }
+    }
+
     function qrcode(\Base $f3)
     {
         $code = $f3->get('REQUEST.code');
@@ -40,18 +51,5 @@ class Info
         $db = Mysql::instance()->get();
         list($summary) = $db->exec('select sku,image,sum(quantity) quantity from virgo_order where order_number=? group by sku,image', [$number]);
         echo json_encode($summary, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    }
-
-    function service(\Base $f3)
-    {
-        $status = [];
-        if ($f3->get('VERB') === 'POST') {
-            exec('nohup php /var/www/cli/background.php &', $status);
-        } else {
-            $windows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-            $command = $windows ? 'tasklist /v | findstr background.php' : 'ps -ef|grep background.php';
-            exec($command, $status);
-        }
-        print_r($status);
     }
 }

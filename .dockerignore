@@ -7,4 +7,6 @@
 /html/barcode
 /html/qrcode
 /runtime
+/sql
+/test
 nohup.out
