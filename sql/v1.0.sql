@@ -52,6 +52,7 @@ create table virgo_material
     quantity int unsigned default 0,
     price    int unsigned default 0 comment 'in cent',
     supplier varchar(200),
+    tech     varchar(500),
     index (name),
     index (type)
 ) engine = InnoDB

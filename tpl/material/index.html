@@ -47,8 +47,9 @@
                 <th>类别</th>
                 <th>位置</th>
                 <th>数量</th>
-                <th>单价</th>
                 <th>供应商</th>
+                <th>单价</th>
+                <th>工艺</th>
             </tr>
             </thead>
             <repeat group="{{@data}}" key="{{@i}}" value="{{@item}}">
@@ -58,8 +59,9 @@
                 <td>{{@item["type"]}}</td>
                 <td>{{@item["location"]}}</td>
                 <td>{{@item["quantity"]}}</td>
-                <td>{{@item["price"]/100}}</td>
                 <td>{{@item["supplier"]}}</td>
+                <td>{{@item["price"]/100}}</td>
+                <td>{{@item["tech"]}}</td>
             </tr>
             </repeat>
         </table>

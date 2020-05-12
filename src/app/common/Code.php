@@ -54,7 +54,8 @@ class Code
         'type' => '类型',
         'quantity' => '数量',
         'location' => '位置',
-        'price' => '单价',
         'supplier' => '供应商',
+        'price' => '单价',
+        'tech' => '工艺',
     ];
 }
