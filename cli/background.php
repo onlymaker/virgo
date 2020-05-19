@@ -3,7 +3,6 @@
 use app\common\Code;
 use app\common\OrderStatus;
 use app\material\Event;
-use app\material\Threshold;
 use app\order\Next;
 use db\Mysql;
 use db\SqlMapper;
@@ -19,44 +18,52 @@ logging('Starting background task ...');
 while (true) {
     try {
         $db = Mysql::instance()->get();
-        $queryOrder = $db->exec('select * from virgo_order where status=' . OrderStatus::WAITING . ' limit 1');
-        if ($queryOrder) {
-            $ready = false;
-            $order = $queryOrder[0];
-            $number = $order['order_number'];
-            $type = $order['order_type'];
-            $sku = $order['sku'];
-            $fields = implode(',', array_flip(Code::PRODUCT_MATERIAL));
-            logging("\norder material check: $number, type: $type");
+        $sniff = $db->exec('select * from virgo_order where status=' . OrderStatus::WAITING . ' limit 1');
+        if ($sniff) {
+            $orderNumber = $sniff[0]['order_number'];
+            if ($sniff[0]['order_type']) {
+                $orders = $db->exec('select * from virgo_order where order_number=?', [$orderNumber]);
+            } else {
+                $orders = [$sniff[0]];
+            }
+            $usage = calcMaterial($orders);
             $db->begin();
-            if ($type) {
-                $queryVolume = $db->exec("select $fields from virgo_product where sku='$sku' order by size");
-                if ($queryVolume) {
-                    $material = new SqlMapper('virgo_material');
-                    $history = Event::instance();
-                    foreach ($queryVolume as $product) {
-                        if (!materialUsage($order, $product)) {
-                            goto READY;
+            $short = [];
+            $material = new SqlMapper('virgo_material');
+            foreach ($usage as $key => $line) {
+                if ($line['quantity']) {
+                    $material->load(['name=?', $line['value']], ['limit' => 1]);
+                    if ($material->dry() && $line['key'] == 'midsole') {
+                        $length = strrpos($line['value'], '-');
+                        if ($length) {
+                            $material->load(['name rlike ?', '^' . substr($line['value'], 0, $length)], ['limit' => 1]);
                         }
                     }
-                    $ready = true;
-                }
-            } else {
-                $queryProduct = $db->exec("select $fields from virgo_product where sku='$sku' limit 1");
-                if ($queryProduct) {
-                    $product = $queryProduct[0];
-                    $ready = materialUsage($order, $product);
+                    if ($material->dry()) {
+                        logging("material not found: {$orderNumber}, {$line['key']}, {$line['value']}");
+                        $short[$key] = array_merge($line, ['message' => 'material not found']);
+                    } else {
+                        if ($material['quantity'] < $line['quantity']) {
+                            logging("material not enough: {$orderNumber}, {$line['key']}, {$line['value']}, required: {$line['quantity']}, contains: {$material['quantity']}");
+                            $short[$key] = array_merge($line, ['message' => 'material not enough: ' . $material['quantity']]);
+                        } else {
+                            (Event::instance())->usage($material->cast(), $orderNumber, $line['quantity']);
+                            $material['quantity'] -= $line['quantity'];
+                            $material->save();
+                        }
+                    }
+                } else {
+                    $short[$key] = array_merge($line, ['message' => 'product not found']);;
                 }
             }
-            READY:
-            if ($ready) {
-                $db->commit();
-                Next::instance()->move($number, OrderStatus::WAITING, OrderStatus::PREPARED, '材料齐备');
-                logging("order material ready: $number, type: $type");
-            } else {
+            if ($short) {
                 $db->rollback();
-                Next::instance()->move($number, OrderStatus::WAITING, OrderStatus::PREPARING, '材料不齐全');
-                logging("order material not ready: $number, type: $type");
+                Next::instance()->move($orderNumber, OrderStatus::WAITING, OrderStatus::PREPARING, '材料不齐');
+                logging("order material not ready: $orderNumber");
+            } else {
+                $db->commit();
+                Next::instance()->move($orderNumber, OrderStatus::WAITING, OrderStatus::PREPARED, '材料齐备');
+                logging("order material ready: $orderNumber");
             }
         }
         sleep(60);
@@ -65,36 +72,37 @@ while (true) {
     }
 }
 
-function materialUsage(array $order, array $product)
+function calcMaterial(array $orders)
 {
-    $history = Event::instance();
-    $material = new SqlMapper('virgo_material');
-    $threshold = (new Threshold())->current();
-    foreach ($product as $field => $value) {
-        if ($value) {
-            $material->load(['name=?', $value]);
-            if ($material->dry() && $field == 'midsole') {
-                $length = strrpos($value, '-');
-                if ($length) {
-                    $material->load(['name rlike ?', '^' . substr($value, 0, $length)], ['limit' => 1]);
-                }
-            }
-            if ($material->dry()) {
-                logging("order material not found: {$order['order_number']}, $field, $value");
-                return false;
-            } else {
-                if ($material['quantity'] > $threshold[$field]) {
-                    $history->usage($material->cast(), $order['order_number'], $order['quantity']);
-                    $material['quantity'] -= $order['quantity'];
-                    $material->save();
+    $usage = [];
+    $db = Mysql::instance()->get();
+    $fields = implode(',', array_flip(Code::PRODUCT_MATERIAL));
+    foreach ($orders as $order) {
+        $query = $db->exec("select $fields from virgo_product where sku=? and size=? limit 1", [$order['sku'], $order['size']]);
+        if ($query) {
+            $product = $query[0];
+            foreach ($product as $key => $value) {
+                $key = md5($value);
+                if ($usage[$key] ?? false) {
+                    $usage[$key]['quantity'] += $order['quantity'];
                 } else {
-                    logging("order material not enough: {$order['order_number']}, $field, $value");
-                    return false;
+                    $usage[$key] = [
+                        'key' => $key,
+                        'value' => $value,
+                        'quantity' => $order['quantity'],
+                    ];
                 }
             }
+        } else {
+            $key = $order['sku'] . '-' . $order['size'];
+            $usage[md5($key)] = [
+                'key' => $key,
+                'value' => 'Product Not Found',
+                'quantity' => 0,
+            ];
         }
     }
-    return true;
+    return $usage;
 }
 
 function logging($message)
