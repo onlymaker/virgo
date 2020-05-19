@@ -48,7 +48,7 @@ while (true) {
                     $ready = materialUsage($order, $product);
                 }
             }
-READY:
+            READY:
             if ($ready) {
                 $db->commit();
                 Next::instance()->move($number, OrderStatus::WAITING, OrderStatus::PREPARED, '材料齐备');
@@ -58,8 +58,6 @@ READY:
                 Next::instance()->move($number, OrderStatus::WAITING, OrderStatus::PREPARING, '材料不齐全');
                 logging("order material not ready: $number, type: $type");
             }
-        } else {
-            logging("No more orders");
         }
         sleep(60);
     } catch (Exception $e) {
@@ -99,7 +97,8 @@ function materialUsage(array $order, array $product)
     return true;
 }
 
-function logging($message) {
+function logging($message)
+{
     global $f3;
     echo $message, "\n";
     $f3->get('BG_LOG')->write($message);
