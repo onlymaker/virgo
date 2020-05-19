@@ -82,11 +82,11 @@ function calcMaterial(array $orders)
         if ($query) {
             $product = $query[0];
             foreach ($product as $key => $value) {
-                $key = md5($value);
-                if ($usage[$key] ?? false) {
-                    $usage[$key]['quantity'] += $order['quantity'];
+                $hash = md5($value);
+                if ($usage[$hash] ?? false) {
+                    $usage[$hash]['quantity'] += $order['quantity'];
                 } else {
-                    $usage[$key] = [
+                    $usage[$hash] = [
                         'key' => $key,
                         'value' => $value,
                         'quantity' => $order['quantity'],
@@ -94,9 +94,9 @@ function calcMaterial(array $orders)
                 }
             }
         } else {
-            $key = $order['sku'] . '-' . $order['size'];
-            $usage[md5($key)] = [
-                'key' => $key,
+            $hash = $order['sku'] . '-' . $order['size'];
+            $usage[md5($hash)] = [
+                'key' => $hash,
                 'value' => 'Product Not Found',
                 'quantity' => 0,
             ];
