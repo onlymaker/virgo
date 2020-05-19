@@ -82,15 +82,17 @@ function calcMaterial(array $orders)
         if ($query) {
             $product = $query[0];
             foreach ($product as $key => $value) {
-                $hash = md5($value);
-                if ($usage[$hash] ?? false) {
-                    $usage[$hash]['quantity'] += $order['quantity'];
-                } else {
-                    $usage[$hash] = [
-                        'key' => $key,
-                        'value' => $value,
-                        'quantity' => $order['quantity'],
-                    ];
+                if ($value) {
+                    $hash = md5($value);
+                    if ($usage[$hash] ?? false) {
+                        $usage[$hash]['quantity'] += $order['quantity'];
+                    } else {
+                        $usage[$hash] = [
+                            'key' => $key,
+                            'value' => $value,
+                            'quantity' => $order['quantity'],
+                        ];
+                    }
                 }
             }
         } else {
