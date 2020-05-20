@@ -60,7 +60,14 @@
                     <td><input type="checkbox" data-number="{{@item['order_number']}}" data-status="{{@item['status']}}"/></td></td>
                     <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
                     <td>{{@item['order_number']}}</td>
-                    <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
+                    <td data-status="{{@item['status']}}">
+                        <check if="{{@item['status']==1}}">
+                            <true>
+                                <div class="btn btn-sm btn-outline-danger btn-short" data-number="{{@item['order_number']}}">{{@statusName[@item['status']]}}</div>
+                            </true>
+                            <false>{{@statusName[@item['status']]}}</false>
+                        </check>
+                    </td>
                     <td>{{@item['sku']}}</td>
                     <td>
                         <repeat group="{{@item['volume']}}" value="{{@detail}}">
@@ -156,6 +163,9 @@
                     })
             }
         });
+        $(".btn-short").on("click", function () {
+            window.open("{{@BASE}}/order/Short?number=" + $(this).data("number"));
+        })
     })
     function refresh() {
         let update = buildQuery({

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>材料短缺信息 - {{@order['order_number']}}</title>
+    <include href="common/header.html"/>
+    <style>
+        body {
+            margin: 50px auto;
+        }
+        h3 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>{{@order['order_number']}} <small>材料短缺信息</small></h3>
+        <table class="table table-sm">
+            <repeat group="{{@short}}" value="{{@item}}">
+                <tr>
+                    <td>{{@item["key"]}}</td>
+                    <td>{{@item["value"]}}</td>
+                    <td>{{@item["quantity"]}}</td>
+                    <td>{{@item["message"]}}</td>
+                </tr>
+            </repeat>
+        </table>
+        <div class="btn btn-block btn-outline-primary btn-close">关闭</div>
+    </div>
+<script>
+    $(function () {
+        $(".btn-close").on("click", function () {
+            window.close();
+        });
+    })
+</script>
+</body>
+</html>
