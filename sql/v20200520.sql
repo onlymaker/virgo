@@ -1,0 +1,1 @@
+alter table virgo_order add column short json default null;

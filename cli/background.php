@@ -58,6 +58,7 @@ while (true) {
             }
             if ($short) {
                 $db->rollback();
+                $db->exec('update virgo_order set short=? where order_number=?', [json_encode($short, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), $orderNumber]);
                 Next::instance()->move($orderNumber, OrderStatus::WAITING, OrderStatus::PREPARING, '材料不齐');
                 logging("order material not ready: $orderNumber");
             } else {
