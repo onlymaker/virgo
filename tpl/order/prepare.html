@@ -30,17 +30,8 @@
     <include href="order/navbar.html"/>
     <div class="container-fluid">
         <div class="btn-group btn-block">
-            <switch expr="{{@status}}">
-                <case value="0">
-                    <button class="btn btn-outline-primary btn-selected-check">已选订单物料计算</button>
-                </case>
-                <case value="1">
-                    <button class="btn btn-outline-primary btn-selected-check" data-redo=1>已选订单重新计算</button>
-                </case>
-                <case value="2">
-                    <button class="btn btn-outline-primary btn-selected-next">已选订单发往下料</button>
-                </case>
-            </switch>
+            <button class="btn btn-outline-primary btn-selected-check">订单材料计算</button>
+            <button class="btn btn-outline-primary btn-selected-next">订单发往下料</button>
         </div>
         <table class="table table-sm">
             <thead class="thead-dark">
@@ -66,7 +57,7 @@
             </thead>
             <repeat group="{{@data}}" value="{{@item}}">
                 <tr>
-                    <td><input type="checkbox" data-number="{{@item['order_number']}}"/></td></td>
+                    <td><input type="checkbox" data-number="{{@item['order_number']}}" data-status="{{@item['status']}}"/></td></td>
                     <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
                     <td>{{@item['order_number']}}</td>
                     <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
@@ -120,13 +111,14 @@
             selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
         });
         $(".btn-selected-check").on("click", function () {
-            let number = getSelected().join(',');
+            let number0 = getSelected(0);
+            let number1 = getSelected(1);
+            let number = number0.concat(number1).join(',');
             if (number) {
                 if (confirm("确认将已选择订单进行材料扣除?")) {
                     exec({
                         action: "check",
                         number: number,
-                        redo: $(this).data("redo"),
                     });
                 }
             } else {
@@ -134,7 +126,7 @@
             }
         });
         $(".btn-selected-next").on("click", function () {
-            let number = getSelected().join(',');
+            let number = getSelected(2).join(',');
             if (number) {
                 if (confirm("确认将已选择订单发往下料?")) {
                     exec({
@@ -187,10 +179,10 @@
                 $(".btn").removeAttr("disabled");
             });
     }
-    function getSelected() {
+    function getSelected(status) {
         let number = [];
         $("input[type=checkbox]").each(function () {
-            if ($(this).prop("checked")) {
+            if ($(this).prop("checked") && $(this).data("status") == status) {
                 number.push($(this).data("number"));
             }
         })

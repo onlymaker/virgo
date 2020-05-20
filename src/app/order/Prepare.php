@@ -63,11 +63,7 @@ class Prepare extends Index
 
     function check($number)
     {
-        if($_POST['redo']) {
-            Next::instance()->move($number, OrderStatus::PREPARING, OrderStatus::WAITING, '订单再次材料核算');
-        } else {
-            Next::instance()->move($number, OrderStatus::INITIAL, OrderStatus::WAITING, '订单首次材料核算');
-        }
+        Next::instance()->move($number, OrderStatus::INITIAL, OrderStatus::WAITING, '订单材料核算');
         echo 'success';
     }
 
