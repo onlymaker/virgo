@@ -64,6 +64,7 @@ class Prepare extends Index
     function check($number)
     {
         Next::instance()->move($number, OrderStatus::INITIAL, OrderStatus::WAITING, '订单材料核算');
+        Next::instance()->move($number, OrderStatus::PREPARING, OrderStatus::WAITING, '订单材料核算');
         echo 'success';
     }
 

@@ -16,9 +16,14 @@
     <div class="container">
         <h3>{{@order['order_number']}} <small>材料短缺信息</small></h3>
         <table class="table table-sm">
+            <thead>
+            <tr>
+                <th></th><th>名称</th><th>数量</th><th>检查结果</th>
+            </tr>
+            </thead>
             <repeat group="{{@short}}" value="{{@item}}">
                 <tr>
-                    <td>{{@item["key"]}}</td>
+                    <td>{{@fields[@item["key"]]}}</td>
                     <td>{{@item["value"]}}</td>
                     <td>{{@item["quantity"]}}</td>
                     <td>{{@item["message"]}}</td>
