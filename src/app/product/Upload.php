@@ -42,6 +42,7 @@ class Upload extends Index
                             if (in_array($euSize, $shoeSize->available()['EU'])) {
                                 $parse[$v] = $euSize;
                             } else {
+                                $this->updateImages($sku);
                                 die($cell . ' Unknown size: ' . $value);
                             }
                         } else {
@@ -56,20 +57,25 @@ class Upload extends Index
                     }
                     $i->next();
                 }
-                $sku = array_unique($sku);
-                if ($sku) {
-                    $filter = implode("','", $sku);
-                    Mysql::instance()->get()->exec(<<<SQL
-update virgo_product v inner join (select sku,thumb,images from prototype) p on v.sku in ('$filter') and v.sku=p.sku set v.image=p.thumb,v.images=p.images
-SQL
-                    );
-                }
+                $this->updateImages($sku);
                 echo 'success';
             } else {
                 die('File format is invalid');
             }
         } catch (\Exception $e) {
             echo $e->getTraceAsString();
+        }
+    }
+
+    function updateImages($skuArr)
+    {
+        $skuArr = array_unique($skuArr);
+        if ($skuArr) {
+            $filter = implode("','", $skuArr);
+            Mysql::instance()->get()->exec(<<<SQL
+update virgo_product v inner join (select sku,thumb,images from prototype) p on v.sku in ('$filter') and v.sku=p.sku set v.image=p.thumb,v.images=p.images
+SQL
+            );
         }
     }
 }
