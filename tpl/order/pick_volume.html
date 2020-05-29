@@ -28,8 +28,27 @@
             <a class="nav-item nav-link" href="{{@BASE}}/order/Pick"><i class="fa fa-chevron-left">&nbsp;</i>返回</a>
         </div>
     </div>
-</nav><div class="container">
-    <p class="h1">{{@materials[0]['order']}}&nbsp;<small class="text-secondary">小批量单</small></p>
+</nav>
+<div class="container">
+    <p class="h2">{{@materials[0]['order']}}</p>
+    <img class="img-thumbnail" src="{{@orders[0]['image']}}"/>
+    <table class="table">
+        <thead class="table-active">
+        <tr>
+            <th>尺码</th>
+            <th>数量</th>
+            <th>样板</th>
+        </tr>
+        </thead>
+        <repeat group="{{@orders}}" value="{{@value}}" counter="{{@cnt}}">
+            <tr>
+                <td>{{@value['size']}}</td>
+                <td>{{@value['quantity']}}</td>
+                <td>{{@value['template']}}</td>
+            </tr>
+        </repeat>
+    </table>
+    <p class="h2">捡料单</p>
     <table class="table">
         <thead class="table-active">
         <tr>

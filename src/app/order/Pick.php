@@ -54,9 +54,10 @@ class Pick extends Index
         $materials = [];
         $product = new SqlMapper('virgo_product');
         $material = new SqlMapper('virgo_material');
-        foreach ($order as $k => $v) {
+        foreach ($order as $k => &$v) {
             $product->load(['sku=? and size=?', $v['sku'], $v['size']]);
             if (!$product->dry()) {
+                $v['template'] = $product['template'];
                 foreach (Code::PRODUCT_MATERIAL as $field => $name) {
                     if ($product[$field]) {
                         $material->load(['name=?', $product[$field]], ['limit' => 1]);
@@ -100,6 +101,7 @@ class Pick extends Index
         $locations = array_column($materials, 'location_format');
         array_multisort($locations, SORT_ASC, $materials);
         \Base::instance()->set('materials', $materials);
+        \Base::instance()->set('orders', $order);
         echo \Template::instance()->render('order/pick_single.html');
     }
 
@@ -127,12 +129,13 @@ class Pick extends Index
         $materials = [];
         $product = new SqlMapper('virgo_product');
         $material = new SqlMapper('virgo_material');
-        foreach ($order as $line) {
+        foreach ($order as &$line) {
             $sku = $line['sku'];
             $size = $line['size'];
             $quantity = $line['quantity'];
             $product->load(['sku=? and size=?', $sku, $size]);
             if (!$product->dry()) {
+                $line['template'] = $product['template'];
                 foreach (Code::PRODUCT_MATERIAL as $field => $name) {
                     if ($product[$field]) {
                         if ($match = $matched[$product[$field]]) {
@@ -182,6 +185,7 @@ class Pick extends Index
         $locations = array_column($materials, 'location_format');
         array_multisort($locations, SORT_ASC, $materials);
         \Base::instance()->set('materials', $materials);
+        \Base::instance()->set('orders', $order);
         echo \Template::instance()->render('order/pick_volume.html');
     }
 }
