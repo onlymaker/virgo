@@ -17,10 +17,10 @@
         <p class="h1">{{@info['order']}}</p>
         <table class="table table-striped">
             <tr><td>SKU</td><td>{{@info['sku']}}</td></tr>
-            <tr><td>数量</td><td>数量：{{@info['quantity']}}</td></tr>
-            <tr><td>楦头</td><td>楦头: {{@info['last']}}</td></tr>
-            <tr><td>面部工艺</td><td>面部工艺: {{@info['upper']}}</td></tr>
-            <tr><td>底部工艺</td><td>底部工艺: {{@info['sole']}}</td></tr>
+            <tr><td>数量</td><td>{{@info['quantity']}}</td></tr>
+            <tr><td>楦头</td><td>{{@info['last']}}</td></tr>
+            <tr><td>面部工艺</td><td>{{@info['upper']}}</td></tr>
+            <tr><td>底部工艺</td><td>{{@info['sole']}}</td></tr>
         </table>
     </div>
     <repeat group="{{@info['images']}}" value="{{@image}}">
