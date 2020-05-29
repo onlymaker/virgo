@@ -3,6 +3,7 @@
 namespace app\order;
 
 use app\common\Code;
+use app\common\Image;
 use db\Mysql;
 use db\SqlMapper;
 
@@ -52,12 +53,14 @@ class Pick extends Index
     {
         $i = 1;
         $materials = [];
+        $helper = Image::instance();
         $product = new SqlMapper('virgo_product');
         $material = new SqlMapper('virgo_material');
         foreach ($order as $k => &$v) {
             $product->load(['sku=? and size=?', $v['sku'], $v['size']]);
             if (!$product->dry()) {
                 $v['template'] = $product['template'];
+                $v['qrcode'] = $helper->qrcode($v['order_number'])['url'];
                 foreach (Code::PRODUCT_MATERIAL as $field => $name) {
                     if ($product[$field]) {
                         $material->load(['name=?', $product[$field]], ['limit' => 1]);
@@ -127,6 +130,7 @@ class Pick extends Index
         $i = 0;
         $matched = [];
         $materials = [];
+        $helper = Image::instance();
         $product = new SqlMapper('virgo_product');
         $material = new SqlMapper('virgo_material');
         foreach ($order as &$line) {
@@ -136,6 +140,7 @@ class Pick extends Index
             $product->load(['sku=? and size=?', $sku, $size]);
             if (!$product->dry()) {
                 $line['template'] = $product['template'];
+                $line['qrcode'] = $helper->qrcode($line['order_number'])['url'];
                 foreach (Code::PRODUCT_MATERIAL as $field => $name) {
                     if ($product[$field]) {
                         if ($match = $matched[$product[$field]]) {

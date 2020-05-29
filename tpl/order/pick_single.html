@@ -34,6 +34,7 @@
             <th>箱号</th>
             <th>订单号</th>
             <th>图片</th>
+            <th>二维码</th>
             <th>样板</th>
         </tr>
         </thead>
@@ -42,6 +43,7 @@
                 <td>{{@cnt}}</td>
                 <td>{{@value['order_number']}}</td>
                 <td><img src="{{@value['image']}}"/></td>
+                <td><img src="{{@value['qrcode']}}"/></td>
                 <td>{{@value['template']}}</td>
             </tr>
         </repeat>
