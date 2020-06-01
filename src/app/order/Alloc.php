@@ -5,6 +5,7 @@ namespace app\order;
 use app\common\Image;
 use app\common\OrderStatus;
 use db\Mysql;
+use db\SqlMapper;
 
 class Alloc extends Index
 {
@@ -61,8 +62,42 @@ class Alloc extends Index
 
     function export($number)
     {
-        echo 'export';
-        print_r($number);
+        $data = [];
+        $helper = Image::instance();
+        $db = Mysql::instance()->get();
+        $order = new SqlMapper('virgo_order');
+        foreach ($number as $value) {
+            $order->load(['order_number=?', $value]);
+            if (!$order->dry()) {
+                if ($order['order_type']) {
+                    $data[] = [
+                        'order' => $order['order_number'],
+                        'sku' => $order['sku'],
+                        'size' => '',
+                        'type' => $order['order_type'],
+                        'express' => '',
+                        'barcode' => $helper->barcode($value)['url'],
+                        'qrcode' => $helper->qrcode($value)['url'],
+                    ];
+                } else {
+                    $query = $db->exec('select distribution_channel from order_item i,distribution d where i.trace_id=? and i.distribution_id=d.id', [$value]);
+                    if ($query) {
+                        preg_match('/\((?<express>\\w+)\)/', $query[0]['distribution_channel'], $match);
+                        $data[] = [
+                            'order' => $order['order_number'],
+                            'sku' => $order['sku'],
+                            'size' => $order['size'],
+                            'type' => $order['order_type'],
+                            'express' => $match['express'],
+                            'barcode' => $helper->barcode($value)['url'],
+                            'qrcode' => $helper->qrcode($value)['url'],
+                        ];
+                    }
+                }
+            }
+        }
+        \Base::instance()->set('data', $data);
+        echo \Template::instance()->render('order/alloc_export.html');
     }
 
     function next($number)

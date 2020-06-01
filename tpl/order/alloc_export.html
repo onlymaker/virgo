@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>下料信息</title>
+    <include href="common/header.html"/>
+    <style>
+        body {
+            margin-top: 1rem;
+        }
+        div.card {
+            padding: 0.25rem;
+        }
+        div.card-body {
+            padding: 0.75rem;
+        }
+        div.card-body p {
+            margin-bottom: 0;
+        }
+        div.card-body img {
+            padding: 0.25rem;
+        }
+        .text-emphasis {
+            float: right;
+            margin-top:-2.75rem;
+            font-size: 2.75rem;
+        }
+        .barcode-img {
+            padding-right: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="card-columns">
+            <repeat group="{{@data}}" value="{{@value}}">
+                <div class="card rounded-0">
+                    <div class="row no-gutters">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <p class="card-text">{{@value['sku']}}&nbsp;&nbsp;<small class="text-muted">{{@value['size']}}</small></p>
+                                <p class="card-text text-emphasis">{{@value['express']}}</p>
+                            </div>
+                            <img src="{{@value['barcode']}}" class="card-img barcode-img" alt="{{@value['order']}}">
+                        </div>
+                        <div class="col-md-4">
+                            <img src="{{@value['qrcode']}}" class="card-img" alt="{{@value['order']}}">
+                        </div>
+                    </div>
+                </div>
+            </repeat>
+        </div>
+    </div>
+<script>
+    $(function () {
+    })
+</script>
+</body>
+</html>
