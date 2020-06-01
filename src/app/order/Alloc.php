@@ -60,7 +60,7 @@ class Alloc extends Index
         print_r($number);
     }
 
-    function export($number)
+    function label($number)
     {
         $data = [];
         $helper = Image::instance();

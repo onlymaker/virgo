@@ -49,6 +49,27 @@ class Code
         'accessory_2' => '扣件2',
     ];
 
+    const ALLOC_MATERIAL = [
+        'fabric_1' => '面料1',
+        'fabric_2' => '面料2',
+        'fabric_3' => '面料3',
+        'lining_1' => '内里1',
+        'lining_2' => '内里2',
+        'lining_3' => '内里3',
+        'surround' => '包料',
+    ];
+
+    const PICK_MATERIAL = [
+        'platform' => '水台',
+        'heel' => '跟',
+        'midsole' => '中底',
+        'outsole' => '大底',
+        'insole' => '膛底',
+        'lace' => '鞋带',
+        'accessory_1' => '扣件1',
+        'accessory_2' => '扣件2',
+    ];
+
     const MATERIAL_SCHEMA = [
         'name' => '型号',
         'type' => '类型',

@@ -61,7 +61,7 @@ class Pick extends Index
             if (!$product->dry()) {
                 $v['template'] = $product['template'];
                 $v['qrcode'] = $helper->qrcode($v['order_number'])['url'];
-                foreach (Code::PRODUCT_MATERIAL as $field => $name) {
+                foreach (Code::PICK_MATERIAL as $field => $name) {
                     if ($product[$field]) {
                         $material->load(['name=?', $product[$field]], ['limit' => 1]);
                         if ($material->dry() && $field == 'midsole') {
@@ -141,7 +141,7 @@ class Pick extends Index
             if (!$product->dry()) {
                 $line['template'] = $product['template'];
                 $line['qrcode'] = $helper->qrcode($line['order_number'])['url'];
-                foreach (Code::PRODUCT_MATERIAL as $field => $name) {
+                foreach (Code::PICK_MATERIAL as $field => $name) {
                     if ($product[$field]) {
                         if ($match = $matched[$product[$field]]) {
                             $materials[$match]['quantity'] += $quantity;
