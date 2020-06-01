@@ -14,9 +14,6 @@
             width: 75px;
             border: none;
         }
-        .img-fluid {
-            width: 125px;
-        }
         .table td {
             vertical-align: middle;
         }
@@ -44,7 +41,7 @@
                 <th>状态</th>
                 <th>SKU</th>
                 <th>总数</th>
-                <th>创建日期</th>
+                <th>条形码</th>
                 <th>二维码</th>
                 <th></th>
             </tr>
@@ -57,7 +54,7 @@
                     <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
                     <td>{{@item['sku']}}</td>
                     <td>{{@item['quantity']}}</td>
-                    <td>{{@item['create_time']}}</td>
+                    <td><img src="{{@item['barcode']}}" alt="{{@item['order_number']}}" class="img-fluid"/></td>
                     <td><img src="{{@item['qrcode']}}" alt="{{@item['order_number']}}" class="img-fluid"/></td>
                     <td>
                         <div class="btn-group">

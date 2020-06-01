@@ -35,20 +35,28 @@ class Image extends \Prefab
         ];
     }
 
-    function barcode($order)
+    function barcode($order, $rewrite = false)
     {
         $dir = ROOT . '/html/barcode/';
         if (!is_dir($dir)) {
             mkdir($dir);
         }
-        file_put_contents(
-            $dir . $order . '.jpg',
-            (new BarcodeGeneratorJPG())->getBarcode(
-                $order,
-                BarcodeGeneratorJPG::TYPE_CODE_128_A,
-                1.5,
-                65
-            )
-        );
+        $domain = \Base::instance()->get('DOMAIN');
+        $image = $dir . $order . '.jpg';
+        if ($rewrite || !is_file($image)) {
+            file_put_contents(
+                $image,
+                (new BarcodeGeneratorJPG())->getBarcode(
+                    $order,
+                    BarcodeGeneratorJPG::TYPE_CODE_128_A,
+                    1.5,
+                    65
+                )
+            );
+        }
+        return [
+            'path' => $image,
+            'url' => $domain . '/barcode/' . $order . '.jpg',
+        ];
     }
 }
