@@ -19,6 +19,10 @@
         div.card-body img {
             padding: 0.25rem;
         }
+        div.col-md-3 {
+            display: flex;
+            align-items: center;
+        }
         .text-emphasis {
             float: right;
             margin-top:-2.75rem;
@@ -43,10 +47,10 @@
                             <img src="{{@value['barcode']}}" class="card-img barcode-img" alt="{{@value['order']}}">
                         </div>
                         <div class="col-md-3">
-                            <img src="{{@value['qrcode']}}" class="card-img" alt="{{@value['order']}}">
+                            <img src="{{@value['image']}}" class="card-img" alt="{{@value['order']}}">
                         </div>
                         <div class="col-md-3">
-                            <img src="{{@value['image']}}" class="card-img" alt="{{@value['order']}}">
+                            <img src="{{@value['qrcode']}}" class="card-img" alt="{{@value['order']}}">
                         </div>
                     </div>
                 </div>
