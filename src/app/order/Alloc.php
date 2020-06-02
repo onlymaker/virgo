@@ -151,6 +151,7 @@ class Alloc extends Index
                         'express' => '',
                         'barcode' => $helper->barcode($value)['url'],
                         'qrcode' => $helper->qrcode($value)['url'],
+                        'image' => $order['image'],
                     ];
                 } else {
                     $query = $db->exec('select distribution_channel from order_item i,distribution d where i.trace_id=? and i.distribution_id=d.id', [$value]);
@@ -164,13 +165,14 @@ class Alloc extends Index
                             'express' => $match['express'],
                             'barcode' => $helper->barcode($value)['url'],
                             'qrcode' => $helper->qrcode($value)['url'],
+                            'image' => $order['image'],
                         ];
                     }
                 }
             }
         }
         \Base::instance()->set('data', $data);
-        echo \Template::instance()->render('order/alloc_export.html');
+        echo \Template::instance()->render('order/alloc_label.html');
     }
 
     function next($number)
