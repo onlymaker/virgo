@@ -28,6 +28,15 @@ while (true) {
             }
             $usage = calcMaterial($orders);
             $db->begin();
+            /**
+             * short:
+             *  - id: 材料id
+             *  - key: 材料类别
+             *  - value: 材料名称
+             *  - message
+             *  - stock: 库存数量
+             *  - quantity: 订单需求
+             */
             $short = [];
             $material = new SqlMapper('virgo_material');
             foreach ($usage as $key => $line) {
@@ -41,11 +50,19 @@ while (true) {
                     }
                     if ($material->dry()) {
                         logging("material not found: {$orderNumber}, {$line['key']}, {$line['value']}");
-                        $short[$key] = array_merge($line, ['message' => 'material not found']);
+                        $short[$key] = array_merge($line, [
+                            'id' => 0,
+                            'message' => 'material not found',
+                            'stock' => 0,
+                        ]);
                     } else {
                         if ($material['quantity'] < $line['quantity']) {
                             logging("material not enough: {$orderNumber}, {$line['key']}, {$line['value']}, required: {$line['quantity']}, contains: {$material['quantity']}");
-                            $short[$key] = array_merge($line, ['message' => 'material not enough: ' . $material['quantity']]);
+                            $short[$key] = array_merge($line, [
+                                'id' => $material['id'],
+                                'message' => 'material not enough',
+                                'stock' => $material['quantity'],
+                            ]);
                         } else {
                             (Event::instance())->usage($material->cast(), $orderNumber, $line['quantity']);
                             $material['quantity'] -= $line['quantity'];
@@ -53,7 +70,11 @@ while (true) {
                         }
                     }
                 } else {
-                    $short[$key] = array_merge($line, ['message' => 'product not found']);;
+                    $short[$key] = array_merge($line, [
+                        'id' => 0,
+                        'message' => 'product not found',
+                        'stock' => 0,
+                    ]);
                 }
             }
             if ($short) {

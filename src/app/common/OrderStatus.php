@@ -31,7 +31,7 @@ class OrderStatus extends \Prefab
             self::SOLE => '底部',
             self::FINISH => '出货',
             self::CANCEL => '取消',
-            self::WAITING => '材料计算',
+            self::WAITING => '材料计算中',
         ];
     }
 }
