@@ -13,6 +13,23 @@
         p small {
             font-size: 1.2rem;
         }
+        @media print {
+            nav {
+                display: none;
+            }
+            p {
+                display: none;
+            }
+            img {
+                display: none;
+            }
+            table:first-of-type {
+                display: none;
+            }
+            .container {
+                padding-top: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -48,8 +65,8 @@
             </tr>
         </repeat>
     </table>
-    <p class="h2">捡料单</p>
-    <table class="table">
+    <p class="h2">捡料单&nbsp;<span class="btn btn-primary" onclick="window.print()">打印</span></p>
+    <table class="table table-sm">
         <thead class="table-active">
         <tr>
             <th>#</th>
