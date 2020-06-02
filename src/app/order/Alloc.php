@@ -2,10 +2,17 @@
 
 namespace app\order;
 
+use app\common\Code;
 use app\common\Image;
 use app\common\OrderStatus;
 use db\Mysql;
 use db\SqlMapper;
+use helper\WebHelper;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Drawing as SharedDrawing;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 class Alloc extends Index
 {
@@ -54,10 +61,76 @@ class Alloc extends Index
         $this->{$action}($number);
     }
 
-    function barcode($number)
+    function export($number)
     {
-        echo 'barcode';
-        print_r($number);
+        //image,order_number,template,quantity,materials
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getSheet(0);
+        $row = 1;
+        $sheet->setCellValue("A$row", '图片')
+            ->setCellValue("B$row", '订单')
+            ->setCellValue("C$row", '样板')
+            ->setCellValue("D$row", '数量');
+        $column = 'E';
+        foreach (Code::ALLOC_MATERIAL as $field) {
+            $sheet->setCellValue("$column$row", $field);
+            $column = chr(ord($column) + 1);
+            $sheet->setCellValue("$column$row", '位置');
+            $column = chr(ord($column) + 1);
+        }
+        $row++;
+        $imgPadding = 5;
+        $imgWidth = 100;
+        $order = new SqlMapper('virgo_order');
+        $product = new SqlMapper('virgo_product');
+        $material = new SqlMapper('virgo_material');
+        foreach ($number as $value) {
+            $order->load(['order_number=?', $value], ['order' => 'size']);
+            if ($order->dry()) {
+                $sheet->setCellValue("B$row", $value);
+                $row++;
+            } else {
+                $image = $order['image'];
+                $drawing = new Drawing();
+                $drawing->setPath(WebHelper::instance()->fetchImageThumbnail($image))
+                    ->setWorksheet($sheet)
+                    ->setCoordinates("A$row")
+                    ->setOffsetX($imgPadding)
+                    ->setOffsetY($imgPadding);
+                $sheet->getRowDimension($row)->setRowHeight(($imgWidth + 2 * $imgPadding) * 0.75);
+                while (!$order->dry()) {
+                    $product->load(['sku=? and size=?', $order['sku'], $order['size']]);
+                    if ($product->dry()) {
+                        //TODO: product data missing
+                    } else {
+                        $sheet->setCellValue("B$row", $value)
+                            ->setCellValue("C$row", $product['template'])
+                            ->setCellValue("D$row", $order['quantity']);
+                        $column = 'E';
+                        $keys = array_keys(Code::ALLOC_MATERIAL);
+                        foreach ($keys as $key) {
+                            $name = $product[$key];
+                            $sheet->setCellValue("$column$row", $name);
+                            $column = chr(ord($column) + 1);
+                            if ($name) {
+                                $material->load(['name=?', $name]);
+                                $position = $material->dry() ? '' : $material['location'];
+                                $sheet->setCellValue("$column$row", $position);
+                            }
+                            $column = chr(ord($column) + 1);
+                        }
+                    }
+                    $order->next();
+                    $row++;
+                }
+            }
+        };
+        $sheet->getColumnDimension('A')
+            ->setWidth(SharedDrawing::pixelsToCellDimension($imgWidth + 2 * $imgPadding, new Font()));
+        $path = '/tmp/alloc_' . date('Ymd') . '.xlsx';
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($path);
+        \Web::instance()->send($path);
     }
 
     function label($number)

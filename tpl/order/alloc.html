@@ -105,18 +105,6 @@
                 alert("没有选择任何订单");
             }
         });
-        $(".btn-selected-barcode").on("click", function () {
-            let number = getSelected().join(',');
-            if (number) {
-                let params = {
-                    action: "barcode",
-                    number: number,
-                };
-                post(location.href, params, "_blank");
-            } else {
-                alert("没有选择任何订单");
-            }
-        });
         $(".btn-selected-next").on("click", function () {
             let number = getSelected().join(',');
             if (number) {
