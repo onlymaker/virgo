@@ -10,6 +10,9 @@
         .btn, .btn-group {
             width: 100%;
         }
+        .btn-create, .btn-refresh {
+            width: auto;
+        }
         .btn-group {
             margin: 2rem auto;
         }
@@ -62,8 +65,12 @@
                     <div class="col">
                         <label class="form-check-label">类别: {{@keys[@item["key"]]}}</label>
                     </div>
-                    <div class="col-4">
+                    <div class="col-5">
                         <label class="form-check-label">材料库中没有该款材料</label>
+                    </div>
+                    <div class="col">
+                        <div class="btn btn-sm btn-primary btn-create">上传材料</div>
+                        <div class="btn btn-sm btn-outline-primary btn-refresh">刷新</div>
                     </div>
                 </div>
                 <hr/>
@@ -102,6 +109,12 @@
                     quantity: quantity.join(",")
                 })
             })
+        });
+        $(".btn-create").on("click", function () {
+            window.open("{{@BASE}}/material/Upload");
+        });
+        $(".btn-refresh").on("click", function () {
+            location.reload();
         })
     })
 </script>
