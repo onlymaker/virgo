@@ -20,6 +20,9 @@
         div.card-body img {
             padding: 0.25rem;
         }
+        div.col-md-6 {
+            z-index: 9999 !important;
+        }
         div.col-md-3 {
             display: flex;
             align-items: center;
@@ -42,6 +45,22 @@
             height: 65px;
             width: auto;
         }
+        @page {
+            margin: auto 0;
+            size: landscape;
+        }
+        @media print {
+            .card-columns {
+                column-gap: 0;
+            }
+            .card {
+                border-left: 0;
+                border-right: 0;
+            }
+            .barcode-img {
+                height: 60px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -59,7 +78,7 @@
                             <img src="{{@value['barcode']}}" class="card-img barcode-img" alt="{{@value['order']}}">
                         </div>
                         <div class="col-md-3">
-                            <img src="{{@value['image']}}" class="card-img" alt="{{@value['order']}}">
+                            <img src="{{@value['image']}}" class="card-img product-img" alt="{{@value['order']}}">
                         </div>
                         <div class="col-md-3 qrcode">
                             <img src="{{@value['qrcode']}}" class="card-img" alt="{{@value['order']}}">
