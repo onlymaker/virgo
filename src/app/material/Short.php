@@ -13,7 +13,13 @@ class Short extends Index
         $data = [];
         $order = new SqlMapper('virgo_order');
         $material = new SqlMapper('virgo_material');
-        $order->load(['status=' . OrderStatus::PREPARING]);
+        if ($f3->get('REQUEST.number') ?? false) {
+            $numbers = implode("','", explode(',', $f3->get('REQUEST.number')));
+            $filter = ['status=' . OrderStatus::PREPARING . " and order_number in ('$numbers')"];
+        } else {
+            $filter = ['status=' . OrderStatus::PREPARING];
+        }
+        $order->load($filter);
         while (!$order->dry()) {
             $short = json_decode($order['short'], true);
             foreach ($short as $key => $line) {
@@ -40,5 +46,10 @@ class Short extends Index
         $f3->set('keys', Code::PRODUCT_MATERIAL);
         $f3->set('data', $data);
         echo \Template::instance()->render('material/short.html');
+    }
+
+    function post(\Base $f3)
+    {
+        $this->get($f3);
     }
 }

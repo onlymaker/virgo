@@ -32,7 +32,7 @@
         <div class="btn-group btn-block">
             <button class="btn btn-outline-primary btn-selected-check">订单材料计算</button>
             <button class="btn btn-outline-primary btn-selected-next">订单发往下料</button>
-            <button class="btn btn-outline-danger btn-buy">缺料采购</button>
+            <button class="btn btn-outline-danger btn-selected-buy">缺料采购</button>
         </div>
         <table class="table table-sm">
             <thead class="thead-dark">
@@ -146,8 +146,13 @@
                 alert("没有选择任何订单");
             }
         });
-        $(".btn-buy").on("click", function () {
-            window.open("{{@BASE}}/material/Short");
+        $(".btn-selected-buy").on("click", function () {
+            let number = getSelected(1).join(',');
+            if (number) {
+                post("{{@BASE}}/material/Short", {number: number}, "_blank");
+            } else {
+                alert("没有选择任何缺料订单");
+            }
         })
         $(".btn-cancel").on("click", function () {
             if (confirm("确认取消订单? 任何条件下取消订单, 都不会自动恢复已经扣减的材料.")) {
