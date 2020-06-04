@@ -102,12 +102,12 @@
                 }
                 id.push($(this).data("id"));
                 quantity.push(q);
-                console.log(serial, id, quantity);
-                post("{{@BASE}}/material/Purchase", {
-                    serial: serial,
-                    id: id.join(","),
-                    quantity: quantity.join(",")
-                })
+            })
+            console.log(serial, id, quantity);
+            post("{{@BASE}}/material/Purchase", {
+                serial: serial,
+                id: id.join(","),
+                quantity: quantity.join(",")
             })
         });
         $(".btn-create").on("click", function () {
