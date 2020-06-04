@@ -3,6 +3,8 @@
 namespace app\material;
 
 use db\SqlMapper;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class Order extends Index
 {
@@ -48,5 +50,33 @@ class Order extends Index
         $order = new SqlMapper('virgo_material_order');
         $order->erase(['id in (' . $f3->get('POST.id') . ')']);
         echo 'success';
+    }
+
+    function export(\Base $f3)
+    {
+        $order = new SqlMapper('virgo_material_order');
+        $order->load(['id in (' . $f3->get('POST.id') . ')'], ['']);
+        $data = [[
+            '供应商', '日期', '采购编号', '类别', '型号', '数量', '单价', '总价'
+        ]];
+        while (!$order->dry()) {
+            $data[] = [
+                $order['plan_supplier'],
+                substr($order['create_time'], 0, 10),
+                $order['serial'],
+                $order['type'],
+                $order['name'],
+                $order['plan_quantity'],
+                $order['plan_price'] / 100,
+                $order['plan_price'] * $order['plan_quantity'] / 100,
+            ];
+            $order->next();
+        }
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getSheet(0);
+        $sheet->fromArray($data);
+        $path = '/tmp/material_order_' . date('Ymd') . '.xlsx';
+        IOFactory::createWriter($spreadsheet, 'Xlsx')->save($path);
+        \Web::instance()->send($path);
     }
 }

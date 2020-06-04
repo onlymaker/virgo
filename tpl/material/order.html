@@ -36,6 +36,7 @@
         <div class="btn-group">
             <button class="btn btn-outline-danger btn-delete">删除</button>
             <button class="btn btn-outline-primary btn-finish">入库</button>
+            <button class="btn btn-outline-primary btn-export">导出</button>
         </div>
         <table class="table table-sm table-striped">
             <thead class="thead-dark">
@@ -139,6 +140,14 @@
                             }
                         })
                 }
+            } else {
+                alert("Selected none");
+            }
+        });
+        $(".btn-export").on("click", function () {
+            let id = getSelected();
+            if (id.length) {
+                post("{{@BASE}}/material/order/export", {id: id.join(",")}, "_blank");
             } else {
                 alert("Selected none");
             }
