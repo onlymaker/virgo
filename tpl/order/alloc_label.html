@@ -6,12 +6,13 @@
     <style>
         body {
             margin-top: 1rem;
+            line-height: 1.25;
         }
         div.card {
-            padding: 0.25rem;
+            padding: 0.5rem;
         }
         div.card-body {
-            padding: 0.75rem;
+            padding: 0;
         }
         div.card-body p {
             margin-bottom: 0;
@@ -23,13 +24,23 @@
             display: flex;
             align-items: center;
         }
+        div.col-md-3.qrcode {
+            flex-direction: column;
+        }
         .text-emphasis {
             float: right;
-            margin-top:-2.75rem;
+            margin-top: -3.25rem;
             font-size: 2.75rem;
         }
+        .text-last {
+            margin-bottom: 0;
+            font-size: 0.75rem;
+        }
         .barcode-img {
+            padding-top: 0.75rem;
             padding-right: 0.75rem;
+            height: 65px;
+            width: auto;
         }
     </style>
 </head>
@@ -41,6 +52,7 @@
                     <div class="row no-gutters">
                         <div class="col-md-6">
                             <div class="card-body">
+                                <p class="card-text">{{@value['order_number']}}</p>
                                 <p class="card-text">{{@value['sku']}}&nbsp;&nbsp;<small class="text-muted">{{@value['size']}}</small></p>
                                 <p class="card-text text-emphasis">{{@value['express']}}</p>
                             </div>
@@ -49,8 +61,9 @@
                         <div class="col-md-3">
                             <img src="{{@value['image']}}" class="card-img" alt="{{@value['order']}}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 qrcode">
                             <img src="{{@value['qrcode']}}" class="card-img" alt="{{@value['order']}}">
+                            <p class="text-last">{{@value['last']}}</p>
                         </div>
                     </div>
                 </div>

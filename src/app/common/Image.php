@@ -24,7 +24,7 @@ class Image extends \Prefab
             $code->setSize(150);
             $code->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0]);
             $code->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0]);
-            $code->setLabel($order, 12, ROOT . '/html/font/SourceHanSansSC-Light.otf', LabelAlignment::CENTER());
+            //$code->setLabel($order, 12, ROOT . '/html/font/SourceHanSansSC-Light.otf', LabelAlignment::CENTER());
             $code->setRoundBlockSize(true);
             $code->setValidateResult(false);
             $code->writeFile($image);

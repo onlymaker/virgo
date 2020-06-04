@@ -5,6 +5,7 @@ namespace app\order;
 use app\common\Code;
 use app\common\Image;
 use app\common\OrderStatus;
+use app\common\OrderType;
 use db\Mysql;
 use db\SqlMapper;
 use helper\WebHelper;
@@ -138,37 +139,38 @@ class Alloc extends Index
         $data = [];
         $helper = Image::instance();
         $db = Mysql::instance()->get();
-        $order = new SqlMapper('virgo_order');
         foreach ($number as $value) {
-            $order->load(['order_number=?', $value]);
-            if (!$order->dry()) {
-                if ($order['order_type']) {
-                    $data[] = [
-                        'order' => $order['order_number'],
-                        'sku' => $order['sku'],
-                        'size' => '',
-                        'type' => $order['order_type'],
-                        'express' => '',
-                        'barcode' => $helper->barcode($value)['url'],
-                        'qrcode' => $helper->qrcode($value)['url'],
-                        'image' => $order['image'],
-                    ];
+            $query = $db->exec('select o.*,p.last from virgo_order o left join virgo_product p on o.sku=p.sku where o.order_number=? limit 1', [$value]);
+            if ($query) {
+                $order = $query[0];
+                $order['barcode'] = $helper->barcode($value)['url'];
+                $order['qrcode'] = $helper->qrcode($value)['url'];
+                if ($order['order_type'] == OrderType::VOLUME) {
+                    unset($order['size']);
+                    $order['express'] = '';
                 } else {
-                    $query = $db->exec('select distribution_channel from order_item i,distribution d where i.trace_id=? and i.distribution_id=d.id', [$value]);
+                    unset($query);
+                    $query = $db->exec('select d.distribution_channel from order_item i,distribution d where i.trace_id=? and i.distribution_id=d.id', [$value]);
                     if ($query) {
                         preg_match('/\((?<express>\\w+)\)/', $query[0]['distribution_channel'], $match);
-                        $data[] = [
-                            'order' => $order['order_number'],
-                            'sku' => $order['sku'],
-                            'size' => $order['size'],
-                            'type' => $order['order_type'],
-                            'express' => $match['express'],
-                            'barcode' => $helper->barcode($value)['url'],
-                            'qrcode' => $helper->qrcode($value)['url'],
-                            'image' => $order['image'],
-                        ];
+                        $order['express'] = $match['express'];
+                    } else {
+                        $order['express'] = '';
                     }
                 }
+                $data[] = $order;
+            } else {
+                $data[] = [
+                    'order_number' => $value,
+                    'sku' => '404',
+                    'size' => '',
+                    'type' => '',
+                    'express' => '',
+                    'barcode' => $helper->barcode($value)['url'],
+                    'qrcode' => $helper->qrcode($value)['url'],
+                    'image' => \Base::instance()->get('BASE') . '/img/holder_100.jpg',
+                    'last' => '',
+                ];
             }
         }
         \Base::instance()->set('data', $data);
