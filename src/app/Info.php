@@ -3,7 +3,6 @@
 namespace app;
 
 use db\Mysql;
-use db\SqlMapper;
 
 class Info
 {
@@ -22,26 +21,27 @@ class Info
     {
         $code = $f3->get('REQUEST.code');
         $db = Mysql::instance()->get();
-        list($count) = $db->exec('select sku,sum(quantity) quantity from virgo_order where order_number=? group by sku', [$code]);
-        if ($count['quantity']) {
-            $product = new SqlMapper('virgo_product');
-            $product->load(['sku=?', $count['sku']]);
-            if ($product->dry()) {
-                $f3->error(404, "找不到产品 {$count['sku']}");
-            } else {
-                $f3->set('info', [
-                    'order' => $code,
-                    'sku' => $count['sku'],
-                    'quantity' => $count['quantity'],
-                    'images' => explode(',', $product['images'] ?: []),
-                    'upper' => $product['process_1'],
-                    'sole' => $product['process_2'],
-                    'last' => $product['last'],
-                ]);
-                echo \Template::instance()->render('info.html');
+        $query = $db->exec('select o.sku,o.size,o.quantity,p.images,p.process_1,p.process_2 from virgo_order o,virgo_product p where o.order_number=? and o.sku=p.sku and o.size=p.size order by size', [$code]);
+        if ($query) {
+            $count = 0;
+            $data = [];
+            foreach ($query as $line) {
+                $count += $line['quantity'];
+                $data[] = [
+                    'size' => $line['size'],
+                    'quantity' => $line['quantity'],
+                    'process_1' => $line['process_1'],
+                    'process_2' => $line['process_2'],
+                ];
             }
+            $f3->set('order', $code);
+            $f3->set('sku', $query[0]['sku']);
+            $f3->set('count', $count);
+            $f3->set('data', $data);
+            $f3->set('images', explode(',', $query[0]['images'] ?: []));
+            echo \Template::instance()->render('info.html');
         } else {
-            $f3->error(404, "找不到订单 $code");
+            $f3->error(404, $code);
         }
     }
 

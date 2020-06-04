@@ -10,21 +10,31 @@
         p.h1 {
             margin: 1.5rem auto 1rem;
         }
+        small {
+            color: gray;
+            font-size: 0.7em;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <p class="h1">{{@info['order']}}</p>
+        <p class="h1">{{@order}} <small>{{@sku}}: 总计{{@count}}双</small></p>
         <table class="table table-striped">
-            <tr><td>SKU</td><td>{{@info['sku']}}</td></tr>
-            <tr><td>数量</td><td>{{@info['quantity']}}</td></tr>
-            <tr><td>楦头</td><td>{{@info['last']}}</td></tr>
-            <tr><td>面部工艺</td><td>{{@info['upper']}}</td></tr>
-            <tr><td>底部工艺</td><td>{{@info['sole']}}</td></tr>
+            <tr>
+                <td>尺码</td><td>数量</td><td>面部工艺</td><td>底部工艺</td>
+            </tr>
+            <repeat group="{{@data}}" value="{{@value}}">
+            <tr>
+                <td>{{@value['size']}}</td>
+                <td>{{@value['quantity']}}</td>
+                <td>{{@value['process_1']}}</td>
+                <td>{{@value['process_2']}}</td>
+            </tr>
+            </repeat>
         </table>
     </div>
-    <repeat group="{{@info['images']}}" value="{{@image}}">
-        <img src="{{@image}}" class="img-fluid" alt="{{@info['sku']}}">
+    <repeat group="{{@images}}" value="{{@image}}">
+        <img src="{{@image}}" class="img-fluid" alt="{{@sku}}">
     </repeat>
 </body>
 </html>
