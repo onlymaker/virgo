@@ -48,9 +48,9 @@ class Image extends \Prefab
                 $image,
                 (new BarcodeGeneratorJPG())->getBarcode(
                     $order,
-                    BarcodeGeneratorJPG::TYPE_CODE_128_A,
+                    BarcodeGeneratorJPG::TYPE_CODE_128,
                     1.5,
-                    65
+                    60
                 )
             );
         }
