@@ -36,7 +36,7 @@
         <table class="table table-sm">
             <thead class="thead-dark">
             <tr>
-                <th>&nbsp;<i class="fa fa-mouse-pointer"></i></th>
+                <th>&nbsp;<i id="selector" class="fa fa-square"></i></th>
                 <th>缩略图</th>
                 <th>订单</th>
                 <th>状态</th>
@@ -74,9 +74,15 @@
     $(function () {
         let selected = false;
         $("ul.pagination").append(pagination("{{@BASE}}/order/Alloc?pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
-        $(".fa-mouse-pointer").on("click", function () {
+        $("#selector").on("click", function () {
+            if (selected) {
+                $("input[type=checkbox]").prop("checked", false);
+                $(this).removeClass("fa-check-square").addClass("fa-square");
+            } else {
+                $("input[type=checkbox]").prop("checked", "checked");
+                $(this).removeClass("fa-square").addClass("fa-check-square");
+            }
             selected = !selected;
-            $("input[type=checkbox]").prop("checked", selected ? "checked" : false);
         });
         $("input[type=checkbox]").on("click", function () {
             selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);

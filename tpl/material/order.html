@@ -41,7 +41,7 @@
         <table class="table table-sm table-striped">
             <thead class="thead-dark">
             <tr>
-                <th>&nbsp;<i class="fa fa-mouse-pointer"></i></th>
+                <th>&nbsp;<i id="selector" class="fa fa-square"></i></th>
                 <th>日期</th>
                 <th>采购编号</th>
                 <th>型号</th>
@@ -93,16 +93,18 @@
             }
         });
         $("ul.pagination").append(pagination("{{@BASE}}/material/Order?" + search + "&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
-        $(".fa-mouse-pointer").on("click", function () {
+        $("#selector").on("click", function () {
+            if (selected) {
+                $("input[type=checkbox]").prop("checked", false);
+                $(this).removeClass("fa-check-square").addClass("fa-square");
+            } else {
+                $("input[type=checkbox]").prop("checked", "checked");
+                $(this).removeClass("fa-square").addClass("fa-check-square");
+            }
             selected = !selected;
-            $("input[type=checkbox]").prop("checked", selected ? "checked" : false);
         });
         $("input[type=checkbox]").on("click", function () {
-            if ($(this).prop("checked") || $("input[type=checkbox]:checked").length) {
-                selected = true;
-            } else {
-                selected = false;
-            }
+            selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
         });
         $(".btn-delete").on("click", function () {
             let id = getSelected();
