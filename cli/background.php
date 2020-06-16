@@ -2,6 +2,7 @@
 
 use app\common\Code;
 use app\common\OrderStatus;
+use app\common\OrderType;
 use app\material\Event;
 use app\order\Next;
 use db\Mysql;
@@ -20,8 +21,9 @@ while (true) {
         $db = Mysql::instance()->get();
         $sniff = $db->exec('select * from virgo_order where status=' . OrderStatus::WAITING . ' limit 1');
         if ($sniff) {
+            $type = $sniff[0]['order_type'];
             $orderNumber = $sniff[0]['order_number'];
-            if ($sniff[0]['order_type']) {
+            if ($type) {
                 $orders = $db->exec('select * from virgo_order where order_number=?', [$orderNumber]);
             } else {
                 $orders = [$sniff[0]];
@@ -42,10 +44,13 @@ while (true) {
             foreach ($usage as $key => $line) {
                 if ($line['quantity']) {
                     $material->load(['name=?', $line['value']], ['limit' => 1]);
-                    if ($material->dry() && $line['key'] == 'midsole') {
-                        $length = strrpos($line['value'], '-');
-                        if ($length) {
-                            $material->load(['name rlike ?', '^' . substr($line['value'], 0, $length)], ['limit' => 1]);
+                    if ($material->dry() || $material['quantity'] == 0) {
+                            if ($type == OrderType::SINGLE && $line['key'] == 'midsole') {
+                            $length = strrpos($line['value'], '-');
+                            if ($length) {
+                                $line['value'] = substr($line['value'], 0, $length);
+                                $material->load(['name=?', $line['value']], ['limit' => 1]);
+                            }
                         }
                     }
                     if ($material->dry()) {
