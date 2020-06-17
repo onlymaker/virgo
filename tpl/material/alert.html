@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>紧缺材料 {{@tabName}}</title>
+    <include href="common/header.html"/>
+    <style>
+        .justify-content-center {
+            margin-left: 1rem;
+        }
+        .pagination {
+            margin-left: 0.75rem;
+        }
+        .input-group {
+            margin: 1rem auto;
+        }
+        .btn-group {
+            margin-bottom: 1rem;
+        }
+        .fa {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <include href="material/navbar.html"/>
+    <div class="container-fluid">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">材料类别</div>
+            </div>
+            <select name="tab">
+                <option></option>
+                <repeat group="{{@tabs}}" key="{{@key}}" value="{{@value}}">
+                <check if="{{@tab == @key}}">
+                    <true><option value="{{@key}}" selected>{{@value}}</option></true>
+                    <false><option value="{{@key}}">{{@value}}</option></false>
+                </check>
+                </repeat>
+            </select>
+            <check if="{{@threshold}}">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">阈值: {{@threshold}}</div>
+                </div>
+            </check>
+        </div>
+        <check if="{{@data}}">
+        <div class="btn-group">
+            <button class="btn btn-outline-primary btn-purchase">采购</button>
+        </div>
+        </check>
+        <table class="table table-sm table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th>&nbsp;<i id="selector" class="fa fa-square"></i></th>
+                <th>型号</th>
+                <th>类别</th>
+                <th>位置</th>
+                <th>数量</th>
+                <th>供应商</th>
+                <th>单价</th>
+                <th>工艺</th>
+            </tr>
+            </thead>
+            <repeat group="{{@data}}" key="{{@i}}" value="{{@item}}">
+            <tr>
+                <td><input type="checkbox" data-id="{{@item['id']}}"/></td>
+                <td>{{@item["name"]}}</td>
+                <td>{{@item["type"]}}</td>
+                <td>{{@item["location"]}}</td>
+                <td>{{@item["quantity"]}}</td>
+                <td>{{@item["supplier"]}}</td>
+                <td>{{@item["price"]/100}}</td>
+                <td>{{@item["tech"]}}</td>
+            </tr>
+            </repeat>
+        </table>
+    </div>
+    <nav>
+        <ul class="pagination justify-content-center"></ul>
+    </nav>
+<script src="{{@BASE}}/js/pagination.js"></script>
+<script>
+    $(function () {
+        let selected = false;
+        $("#selector").on("click", function () {
+            if (selected) {
+                $("input[type=checkbox]").prop("checked", false);
+                $(this).removeClass("fa-check-square").addClass("fa-square");
+            } else {
+                $("input[type=checkbox]").prop("checked", "checked");
+                $(this).removeClass("fa-square").addClass("fa-check-square");
+            }
+            selected = !selected;
+        });
+        $("input[type=checkbox]").on("click", function () {
+            selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
+        });
+        $("ul.pagination").append(pagination("{{@BASE}}/material/Alert?tab={{@tab}}&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
+        $("select").on("change", function () {
+            let tab = $(this).val();
+            if (tab != "{{@tab}}") {
+                location.href = "{{@BASE}}/material/Alert?tab=" + tab;
+            }
+        })
+        $(".btn-purchase").on("click", function () {
+            let id = getSelected();
+            if (id.length) {
+                location.href = "{{@BASE}}/material/Purchase?id=" + id.join(",")
+            } else {
+                alert("Selected none");
+            }
+        });
+    })
+    function getSelected() {
+        let id = [];
+        $("input[type=checkbox]").each(function () {
+            if ($(this).prop("checked")) {
+                id.push($(this).data("id"));
+            }
+        })
+        return id;
+    }
+</script>
+</body>
+</html>
