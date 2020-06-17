@@ -37,7 +37,6 @@
         <table class="table table-sm">
             <thead class="thead-dark">
             <tr>
-                <th>&nbsp;<i id="selector" class="fa fa-square"></i></th>
                 <th>缩略图</th>
                 <th>订单</th>
                 <th>
@@ -58,7 +57,6 @@
             </thead>
             <repeat group="{{@data}}" value="{{@item}}">
                 <tr>
-                    <td><input type="checkbox" data-number="{{@item['order_number']}}" data-status="{{@item['status']}}"/></td></td>
                     <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
                     <td>{{@item['order_number']}}</td>
                     <td data-status="{{@item['status']}}">
@@ -105,24 +103,10 @@
                 }
             });
         }
-        let selected = false;
         $("ul.pagination").append(pagination("{{@BASE}}/order/Prepare?" + search + "&pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
         $("#status").on("change", function () {
             $(this).after("<i class='fa fa-spinner fa-pulse animated'>&nbsp;</i>");
             refresh();
-        });
-        $("#selector").on("click", function () {
-            if (selected) {
-                $("input[type=checkbox]").prop("checked", false);
-                $(this).removeClass("fa-check-square").addClass("fa-square");
-            } else {
-                $("input[type=checkbox]").prop("checked", "checked");
-                $(this).removeClass("fa-square").addClass("fa-check-square");
-            }
-            selected = !selected;
-        });
-        $("input[type=checkbox]").on("click", function () {
-            selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
         });
         $(".btn-selected-check").on("click", function () {
             if (confirm("确认将所有订单进行材料扣除?")) {
@@ -184,15 +168,6 @@
             .always(function () {
                 $(".btn").removeAttr("disabled");
             });
-    }
-    function getSelected(status) {
-        let number = [];
-        $("input[type=checkbox]").each(function () {
-            if ($(this).prop("checked") && $(this).data("status") == status) {
-                number.push($(this).data("number"));
-            }
-        })
-        return number;
     }
 </script>
 </body>
