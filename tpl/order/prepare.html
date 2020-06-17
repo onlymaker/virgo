@@ -125,40 +125,21 @@
             selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
         });
         $(".btn-selected-check").on("click", function () {
-            let number0 = getSelected(0);
-            let number1 = getSelected(1);
-            let number = number0.concat(number1).join(',');
-            if (number) {
-                if (confirm("确认将已选择订单进行材料扣除?")) {
-                    exec({
-                        action: "check",
-                        number: number,
-                    });
-                }
-            } else {
-                alert("没有选择任何订单");
+            if (confirm("确认将所有订单进行材料扣除?")) {
+                exec({
+                    action: "check",
+                });
             }
         });
         $(".btn-selected-next").on("click", function () {
-            let number = getSelected(2).join(',');
-            if (number) {
-                if (confirm("确认将已选择订单发往下料?")) {
-                    exec({
-                        action: "next",
-                        number: number,
-                    });
-                }
-            } else {
-                alert("没有选择任何订单");
+            if (confirm("确认将所有订单发往下料?")) {
+                exec({
+                    action: "next",
+                });
             }
         });
         $(".btn-selected-buy").on("click", function () {
-            let number = getSelected(1).join(',');
-            if (number) {
-                post("{{@BASE}}/material/Short", {number: number}, "_blank");
-            } else {
-                alert("没有选择任何缺料订单");
-            }
+            post("{{@BASE}}/material/Short", null, "_blank")
         })
         $(".btn-cancel").on("click", function () {
             if (confirm("确认取消订单? 任何条件下取消订单, 都不会自动恢复已经扣减的材料.")) {

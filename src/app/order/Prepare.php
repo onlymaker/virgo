@@ -57,20 +57,28 @@ class Prepare extends Index
     function post(\Base $f3)
     {
         $action = $f3->get('POST.action');
-        $number = explode(',', $f3->get('POST.number'));
-        $this->{$action}($number);
+        $this->{$action}();
     }
 
-    function check($number)
+    function check()
     {
-        Next::instance()->move($number, OrderStatus::INITIAL, OrderStatus::WAITING, '订单材料核算');
-        Next::instance()->move($number, OrderStatus::PREPARING, OrderStatus::WAITING, '订单材料核算');
+        $query = Mysql::instance()->get()->exec('select order_number from virgo_order where status=?', [OrderStatus::INITIAL]);
+        if ($query) {
+            Next::instance()->move(array_column($query, 'order_number'), OrderStatus::INITIAL, OrderStatus::WAITING, '订单材料核算');
+        }
+        $query = Mysql::instance()->get()->exec('select order_number from virgo_order where status=?', [OrderStatus::PREPARING]);
+        if ($query) {
+            Next::instance()->move(array_column($query, 'order_number'), OrderStatus::PREPARING, OrderStatus::WAITING, '订单材料再次核算');
+        }
         echo 'success';
     }
 
-    function next($number)
+    function next()
     {
-        Next::instance()->move($number, OrderStatus::PREPARED, OrderStatus::ALLOCATED, '订单发往下料');
+        $query = Mysql::instance()->get()->exec('select order_number from virgo_order where status=?', [OrderStatus::PREPARED]);
+        if ($query) {
+            Next::instance()->move(array_column($query, 'order_number'), OrderStatus::PREPARED, OrderStatus::ALLOCATED, '订单发往下料');
+        }
         echo 'success';
     }
 }
