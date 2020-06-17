@@ -26,7 +26,15 @@ class Short extends Index
                 if ($data[$key] && $data[$key]['id']) {
                     $data[$key]['quantity'] += $line['quantity'];
                 } else {
-                    $material->load(['id=?', $line['id']]);
+                    if ($line['id']) {
+                        $material->load(['id=?', $line['id']]);
+                    } else {
+                        //Materials maybe upload when access the short page, so we need to check it again
+                        $material->load(['name=? and type=?', $line['value'], Code::PRODUCT_MATERIAL[$line['key']]]);
+                        if (!$material->dry()) {
+                            $line['id'] = $material['id'];
+                        }
+                    }
                     if ($material->dry()) {
                         if ($data[$key]) {
                             $data[$key]['quantity'] += $line['quantity'];
