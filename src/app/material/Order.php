@@ -37,10 +37,20 @@ class Order extends Index
         $order->load(['id in (' . $f3->get('POST.id') . ')']);
         while (!$order->dry()) {
             $material->load(['name=? and type=?', $order['name'], $order['type']]);
-            $event->purchase($material->cast(), $order->cast());
-            $order['status'] = 1;
-            $order->save();
-            $order->next();
+            if ($material->dry()) {
+                die("{$order['name']} {$order['type']} not found");
+            } else {
+                $prev = $material->cast();
+                $material['price'] = $order['final_price'];
+                $material['quantity'] += $order['final_quantity'];
+                $material['supplier'] = $order['final_supplier'];
+                $material->save();
+                $current = $material->cast();
+                $order['status'] = 1;
+                $order->save();
+                $event->purchase($order->cast(), $prev, $current);
+                $order->next();
+            }
         }
         echo 'success';
     }

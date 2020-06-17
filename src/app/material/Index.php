@@ -20,7 +20,7 @@ class Index extends AppBase
         $filter = array_merge([implode(' and ', $filter)], $params);
         $pageNo = $f3->get('GET.pageNo') ?? 1;
         $mapper = new SqlMapper('virgo_material');
-        $page = $mapper->paginate($pageNo - 1, self::PAGE_SIZE, $filter, ['order' => 'name']);
+        $page = $mapper->paginate($pageNo - 1, self::PAGE_SIZE, $filter, ['order' => 'length(name),name']);
         $f3->set('name', $name);
         $f3->set('pageNo', $page['pos'] + 1);
         $f3->set('pageCount', $page['count']);

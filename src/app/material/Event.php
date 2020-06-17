@@ -41,7 +41,7 @@ class Event extends \Prefab
         $history->save();
     }
 
-    function purchase(array $prev, array $order) {
+    function purchase(array $order, array $prev, array $current) {
         $history = new SqlMapper('virgo_material_history');
         $history['name'] = $order['name'];
         $history['type'] = $order['type'];
@@ -50,10 +50,7 @@ class Event extends \Prefab
             'serial' => $order['serial']
         ]);
         $history['previous'] = $this->toJson($prev);
-        $prev['quantity'] += $order['final_quantity'];
-        $prev['price'] = $order['final_price'];
-        $prev['supplier'] = $order['final_supplier'];
-        $history['current'] = $this->toJson($prev);
+        $history['current'] = $this->toJson($current);
         $history->save();
     }
 
