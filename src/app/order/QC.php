@@ -32,19 +32,13 @@ class QC extends Index
         $description = $f3->get('POST.description') ?? '';
         if ($rejected) {
             $qc = new SqlMapper('virgo_order_qc');
-            $qc->load(["order_number=? and date_format(create_time, '%Y-%m-%d')=current_date"]);
+            $qc->load(["order_number=? and date_format(create_time, '%Y-%m-%d')=current_date", $number]);
             if ($qc->dry()) {
                 $db = Mysql::instance()->get();
                 $db->begin();
                 $db->exec([
-                    <<<SQL
-insert into virgo_order_history (sku,size,image,quantity,order_type,order_sponsor,order_channel,order_number,status,description)
-select sku,size,image,quantity,order_type,order_sponsor,order_channel,order_number,status,? from virgo_order where order_number=? and status=?
-SQL,
-                    <<<SQL
-insert into virgo_order_qc (sku,image,quantity,rejected,order_type,order_sponsor,order_channel,order_number,description)
-select sku,image,quantity,?,order_type,order_sponsor,order_channel,order_number,? from virgo_order where order_number=? and status=?
-SQL,
+'insert into virgo_order_history (sku,size,image,quantity,order_type,order_sponsor,order_channel,order_number,status,description) select sku,size,image,quantity,order_type,order_sponsor,order_channel,order_number,status,? from virgo_order where order_number=? and status=?',
+'insert into virgo_order_qc (sku,image,quantity,rejected,order_type,order_sponsor,order_channel,order_number,description) select sku,image,quantity,?,order_type,order_sponsor,order_channel,order_number,? from virgo_order where order_number=? and status=?',
                 ], [
                     ['QC', $number, OrderStatus::SOLE],
                     [$rejected, $description, $number, OrderStatus::SOLE]
