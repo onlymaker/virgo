@@ -46,8 +46,8 @@ class Finish extends Index
 
     function post(\Base $f3)
     {
-        $action = $f3->get('POST.action');
         $number = explode(',', $f3->get('POST.number'));
-        $this->{$action}($number);
+        Next::instance()->move($number, OrderStatus::SOLE, OrderStatus::FINISH, '订单完成');
+        echo 'success';
     }
 }

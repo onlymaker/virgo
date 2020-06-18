@@ -90,7 +90,18 @@
             let number = getSelected().join(',');
             if (number) {
                 if (confirm("确认出货?")) {
-                    alert(number);
+                    $(".btn-selected-finish").attr("disabled", "disabled");
+                    $.post(location.href, {number: number})
+                        .done(function (text) {
+                            alert(text);
+                            if (text === "success") {
+                                location.reload();
+                            }
+                        })
+                        .fail(generalCallback)
+                        .always(function () {
+                            $(".btn-selected-finish").removeAttr("disabled");
+                        });
                 }
             } else {
                 alert("没有选择任何订单");
