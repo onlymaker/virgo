@@ -31,13 +31,15 @@
 <body>
     <include href="order/navbar.html"/>
     <div class="container-fluid">
+        <div class="btn-group btn-block">
+            <button class="btn btn-outline-primary btn-selected-finish">出货</button>
+        </div>
         <table class="table table-sm">
             <thead class="thead-dark">
             <tr>
                 <th>&nbsp;<i id="selector" class="fa fa-square"></i></th>
                 <th>缩略图</th>
                 <th>订单</th>
-                <th>状态</th>
                 <th>SKU</th>
                 <th>总数</th>
                 <th>创建日期</th>
@@ -50,7 +52,6 @@
                     <td><input type="checkbox" data-number="{{@item['order_number']}}"/></td></td>
                     <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
                     <td>{{@item['order_number']}}</td>
-                    <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
                     <td>{{@item['sku']}}</td>
                     <td>{{@item['quantity']}}</td>
                     <td>{{@item['create_time']}}</td>
@@ -85,6 +86,27 @@
         $("input[type=checkbox]").on("click", function () {
             selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
         });
+        $(".btn-selected-finish").on("click", function () {
+            let number = getSelected().join(',');
+            if (number) {
+                if (confirm("确认出货?")) {
+                    $(".btn-selected-finish").attr("disabled", "disabled");
+                    $.post(location.href, {number: number})
+                        .done(function (text) {
+                            alert(text);
+                            if (text === "success") {
+                                location.reload();
+                            }
+                        })
+                        .fail(generalCallback)
+                        .always(function () {
+                            $(".btn-selected-finish").removeAttr("disabled");
+                        });
+                }
+            } else {
+                alert("没有选择任何订单");
+            }
+        });
         $(".btn-cancel").on("click", function () {
             if (confirm("确认取消订单? 任何条件下取消订单, 都不会自动恢复已经扣减的材料.")) {
                 $(".btn").attr("disabled", "disabled");
@@ -104,6 +126,15 @@
             }
         });
     })
+    function getSelected() {
+        let number = [];
+        $("input[type=checkbox]").each(function () {
+            if ($(this).prop("checked")) {
+                number.push($(this).data("number"));
+            }
+        })
+        return number;
+    }
 </script>
 </body>
 </html>

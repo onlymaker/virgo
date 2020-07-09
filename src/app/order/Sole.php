@@ -41,14 +41,13 @@ class Sole extends Index
         $f3->set('pageNo', $pageNo);
         $f3->set('pageCount', ceil($count['total'] / $pageSize));
         $f3->set('data', $data);
-        $f3->set('statusName', OrderStatus::instance()->name());
         echo \Template::instance()->render('order/sole.html');
     }
 
     function post(\Base $f3)
     {
-        $action = $f3->get('POST.action');
         $number = explode(',', $f3->get('POST.number'));
-        $this->{$action}($number);
+        Next::instance()->move($number, OrderStatus::SOLE, OrderStatus::FINISH, '订单完成');
+        echo 'success';
     }
 }

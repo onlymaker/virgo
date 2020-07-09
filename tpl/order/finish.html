@@ -1,21 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>底部管理</title>
+    <title>已完成订单</title>
     <include href="common/header.html"/>
     <style>
-        .btn-group {
-            margin: 2rem auto 1.5rem;
-        }
-        .fa {
-            cursor: pointer;
-        }
         .img-thumbnail {
             width: 75px;
             border: none;
-        }
-        .img-fluid {
-            width: 125px;
         }
         .table td {
             vertical-align: middle;
@@ -31,36 +22,25 @@
 <body>
     <include href="order/navbar.html"/>
     <div class="container-fluid">
-        <div class="btn-group btn-block">
-            <button class="btn btn-outline-primary btn-selected-finish">出货</button>
-        </div>
         <table class="table table-sm">
             <thead class="thead-dark">
             <tr>
-                <th>&nbsp;<i id="selector" class="fa fa-square"></i></th>
                 <th>缩略图</th>
                 <th>订单</th>
+                <th>状态</th>
                 <th>SKU</th>
                 <th>总数</th>
                 <th>创建日期</th>
-                <th>二维码</th>
-                <th></th>
             </tr>
             </thead>
             <repeat group="{{@data}}" value="{{@item}}">
                 <tr>
-                    <td><input type="checkbox" data-number="{{@item['order_number']}}"/></td></td>
                     <td><img class="img-thumbnail" src="{{@item['image']}}"/></td>
                     <td>{{@item['order_number']}}</td>
+                    <td data-status="{{@item['status']}}">{{@statusName[@item['status']]}}</td>
                     <td>{{@item['sku']}}</td>
                     <td>{{@item['quantity']}}</td>
                     <td>{{@item['create_time']}}</td>
-                    <td><img src="{{@item['qrcode']}}" alt="{{@item['order_number']}}" class="img-fluid"/></td>
-                    <td>
-                        <div class="btn-group">
-                            <div class="btn btn-sm btn-outline-danger btn-cancel" data-number="{{@item['order_number']}}">取消订单</div>
-                        </div>
-                    </td>
                 </tr>
             </repeat>
         </table>
@@ -71,70 +51,8 @@
 <script src="{{@BASE}}/js/pagination.js"></script>
 <script>
     $(function () {
-        let selected = false;
         $("ul.pagination").append(pagination("{{@BASE}}/order/Sole?pageNo=", "{{@pageNo}}", "{{@pageCount}}"));
-        $("#selector").on("click", function () {
-            if (selected) {
-                $("input[type=checkbox]").prop("checked", false);
-                $(this).removeClass("fa-check-square").addClass("fa-square");
-            } else {
-                $("input[type=checkbox]").prop("checked", "checked");
-                $(this).removeClass("fa-square").addClass("fa-check-square");
-            }
-            selected = !selected;
-        });
-        $("input[type=checkbox]").on("click", function () {
-            selected = !!($(this).prop("checked") || $("input[type=checkbox]:checked").length);
-        });
-        $(".btn-selected-finish").on("click", function () {
-            let number = getSelected().join(',');
-            if (number) {
-                if (confirm("确认出货?")) {
-                    $(".btn-selected-finish").attr("disabled", "disabled");
-                    $.post(location.href, {number: number})
-                        .done(function (text) {
-                            alert(text);
-                            if (text === "success") {
-                                location.reload();
-                            }
-                        })
-                        .fail(generalCallback)
-                        .always(function () {
-                            $(".btn-selected-finish").removeAttr("disabled");
-                        });
-                }
-            } else {
-                alert("没有选择任何订单");
-            }
-        });
-        $(".btn-cancel").on("click", function () {
-            if (confirm("确认取消订单? 任何条件下取消订单, 都不会自动恢复已经扣减的材料.")) {
-                $(".btn").attr("disabled", "disabled");
-                $.post("{{@BASE}}/order/Cancel", {
-                    number: $(this).data("number")
-                })
-                    .done(function (text) {
-                        alert(text);
-                        if (text === "success") {
-                            location.reload();
-                        }
-                    })
-                    .fail(generalCallback)
-                    .always(function () {
-                        $(".btn").removeAttr("disabled");
-                    })
-            }
-        });
     })
-    function getSelected() {
-        let number = [];
-        $("input[type=checkbox]").each(function () {
-            if ($(this).prop("checked")) {
-                number.push($(this).data("number"));
-            }
-        })
-        return number;
-    }
 </script>
 </body>
 </html>
