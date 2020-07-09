@@ -20,6 +20,21 @@ class OrderStatus extends \Prefab
         return $class->getConstants();
     }
 
+    function next($status)
+    {
+        switch ($status) {
+            case self::PREPARED:
+                return self::ALLOCATED;
+            case self::ALLOCATED:
+                return self::UPPER;
+            case self::UPPER:
+                return self::SOLE;
+            case self::SOLE:
+                return self::FINISH;
+        }
+        return $status;
+    }
+
     function name()
     {
         return [

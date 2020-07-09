@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>扫码</title>
+    <include href="common/header.html"/>
+    <style>
+        .container {
+            padding-top: 2.5rem;
+        }
+        table {
+            margin: 1.5rem auto 1rem;
+        }
+    </style>
+</head>
+<body>
+<include href="order/navbar.html"/>
+<div class="container">
+    <p class="text-secondary">点击按钮后，所有订单将被修改为下一个状态，请仔细检查</p>
+    <div class="input-group">
+        <input type="text" name="order_number" class="form-control"/>
+    </div>
+    <table class="table table-striped"></table>
+    <div class="btn btn-block btn-primary btn-next">发往下一步</div>
+</div>
+<script>
+    let input = $("input[name=order_number]");
+    function add() {
+        let order = input.val();
+        if (order) {
+            $("table").append("<tr><td>" + order + "</td><td><div class='btn btn-sm btn-danger' onclick='remove($(this))'>删除</div></td></tr>");
+            input.val("");
+        }
+    }
+    function remove(o) {
+        o.parent().parent().remove();
+        input.focus();
+    }
+    $(function () {
+        input.focus().on("change", add);
+        $(".btn-next").on("click", function () {
+            let number = [];
+            $("tr").each(function () {
+                let value = $(this).find("td").eq(0).text();
+                if (number.indexOf(value) === -1) {
+                    number.push(value);
+                }
+            });
+            if (number.length === 0) {
+                alert("请输入订单号");
+            } else {
+                if (confirm("所有订单将被修改为下一个状态，操作无法取消，是否确认？")) {
+                    post(location.href, {
+                        number: number.join(","),
+                    })
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>
