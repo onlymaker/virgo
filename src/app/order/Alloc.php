@@ -51,6 +51,7 @@ class Alloc extends Index
         $f3->set('pageNo', $pageNo);
         $f3->set('pageCount', ceil($count['total'] / $pageSize));
         $f3->set('data', $data);
+        $f3->set('status', OrderStatus::ALLOCATED);
         $f3->set('statusName', OrderStatus::instance()->name());
         echo \Template::instance()->render('order/alloc.html');
     }

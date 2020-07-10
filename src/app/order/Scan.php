@@ -3,33 +3,35 @@
 namespace app\order;
 
 use app\common\OrderStatus;
-use db\Mysql;
 
 class Scan extends Index
 {
     function get(\Base $f3)
     {
-        echo \Template::instance()->render('order/scan.html');
+        $status = $f3->get('GET.status');
+        $os = OrderStatus::instance();
+        $next = $os->next($status);
+        if ($status != $next) {
+            $name = $os->name();
+            $f3->set('status', $status);
+            $f3->set('next', $next);
+            $f3->set('name', $name);
+            echo \Template::instance()->render('order/scan.html');
+        } else {
+            die('Invalid order status ' . $status);
+        }
     }
 
     function post(\Base $f3)
     {
         $number = explode(',', $f3->get("POST.number"));
-        $db = Mysql::instance()->get();
-        $numbers = implode("','", $number);
-        $query = $db->exec("select distinct status from virgo_order where order_number in ('$numbers')");
-        if ($query) {
-            if (count($query) > 1) {
-                die("订单存在多个状态，请修改后重新提交");
-            }
-            foreach ($query as $status) {
-                $next = OrderStatus::instance()->next($status);
-                if ($status != $next) {
-                    Next::instance()->move($number, $status, $next, '扫码批量修改订单状态');
-                }
-            }
-        }
-        echo <<<HTML
+        $status = $f3->get('POST.status');
+        $next = $f3->get('POST.next');
+        $os = OrderStatus::instance();
+        $name = $os->name();
+        if ($next == $os->next($status)) {
+            Next::instance()->move($number, $status, $next, "扫码批量修改订单状态为: " . $name[$next]);
+            echo <<<HTML
 <h1>Success</h1>
 <p>即将跳回扫码页面 ...</p>
 <script>
@@ -38,5 +40,8 @@ setTimeout(function() {
 }, 3000);
 </script>
 HTML;
+        } else {
+            die('Invalid order status ' . $status);
+        }
     }
 }

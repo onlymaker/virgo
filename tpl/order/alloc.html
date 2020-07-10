@@ -32,6 +32,7 @@
             <button class="btn btn-outline-primary btn-selected-export">导出信息</button>
             <button class="btn btn-outline-primary btn-selected-label">生成标签</button>
             <button class="btn btn-outline-primary btn-selected-next">发往面部</button>
+            <button class="btn btn-outline-info btn-selected-scan">扫码发往面部</button>
         </div>
         <table class="table table-sm">
             <thead class="thead-dark">
@@ -123,6 +124,9 @@
             } else {
                 alert("没有选择任何订单");
             }
+        });
+        $(".btn-selected-scan").on("click", function () {
+            location.href = "{{@BASE}}/order/Scan?status={{@status}}"
         });
         $(".btn-cancel").on("click", function () {
             if (confirm("确认取消订单? 任何条件下取消订单, 都不会自动恢复已经扣减的材料.")) {

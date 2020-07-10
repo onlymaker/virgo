@@ -34,6 +34,7 @@
         <div class="btn-group btn-block">
             <button class="btn btn-outline-primary btn-selected-pick">扫码捡料</button>
             <button class="btn btn-outline-primary btn-selected-next">发往底部</button>
+            <button class="btn btn-outline-info btn-selected-scan">扫码发往底部</button>
         </div>
         <table class="table table-sm">
             <thead class="thead-dark">
@@ -115,6 +116,9 @@
             } else {
                 alert("没有选择任何订单");
             }
+        });
+        $(".btn-selected-scan").on("click", function () {
+            location.href = "{{@BASE}}/order/Scan?status={{@status}}"
         });
         $(".btn-cancel").on("click", function () {
             if (confirm("确认取消订单? 任何条件下取消订单, 都不会自动恢复已经扣减的材料.")) {

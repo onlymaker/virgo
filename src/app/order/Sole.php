@@ -41,6 +41,7 @@ class Sole extends Index
         $f3->set('pageNo', $pageNo);
         $f3->set('pageCount', ceil($count['total'] / $pageSize));
         $f3->set('data', $data);
+        $f3->set('status', OrderStatus::SOLE);
         echo \Template::instance()->render('order/sole.html');
     }
 
