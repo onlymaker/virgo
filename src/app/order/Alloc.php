@@ -25,7 +25,7 @@ class Alloc extends Index
         } else {
             $pageNo = 1;
         }
-        $pageSize = 25;
+        $pageSize = 24;
         $params = [];
         $filter = [];
         foreach ($_GET as $name => $value) {
