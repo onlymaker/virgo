@@ -141,7 +141,7 @@ class Alloc extends Index
         $helper = Image::instance();
         $db = Mysql::instance()->get();
         foreach ($number as $value) {
-            $query = $db->exec('select o.*,p.last from virgo_order o left join virgo_product p on o.sku=p.sku where o.order_number=? limit 1', [$value]);
+            $query = $db->exec('select o.*,p.last,p.midsole from virgo_order o left join virgo_product p on o.sku=p.sku and o.size=p.size where o.order_number=? limit 1', [$value]);
             if ($query) {
                 $order = $query[0];
                 $order['barcode'] = $helper->barcode($value)['url'];
@@ -159,6 +159,7 @@ class Alloc extends Index
                         $order['express'] = '';
                     }
                 }
+                $order['last'] = $order['midsole'];
                 $data[] = $order;
             } else {
                 $data[] = [
